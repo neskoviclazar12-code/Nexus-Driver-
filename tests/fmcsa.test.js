@@ -36,3 +36,14 @@ test('call_request is validated and emailed',async()=>{
   assert.match(calls[0][0].text,/cpm rate: 72–75¢/);assert.match(calls[0][1].subject,/call request/);
  }finally{globalThis.fetch=original;if(old===undefined)delete process.env.RESEND_API_KEY;else process.env.RESEND_API_KEY=old;}
 });
+test('general_message works without phone',async()=>{
+ const original=globalThis.fetch;const old=process.env.RESEND_API_KEY;const calls=[];
+ process.env.RESEND_API_KEY='test';globalThis.fetch=async(u,o)=>{calls.push(JSON.parse(o.body));return Response.json({data:[{id:'a'},{id:'b'}]});};
+ const req=d=>new Request('https://www.nexusdrivers.com/api/contact',{method:'POST',headers:{'Content-Type':'application/json',Origin:'https://www.nexusdrivers.com'},body:JSON.stringify(d)});
+ const base={form:'general_message',submission_id:'aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee',name:'Ana',email:'ana@example.com',role:'Carrier',message:'Hello'};
+ try{
+  assert.equal((await contact.fetch(req(base))).status,200);assert.match(calls[0][0].subject,/New message \(Carrier\)/);
+  assert.equal((await contact.fetch(req({...base,phone:'123'}))).status,400);
+  assert.equal((await contact.fetch(req({...base,message:''}))).status,400);
+ }finally{globalThis.fetch=original;if(old===undefined)delete process.env.RESEND_API_KEY;else process.env.RESEND_API_KEY=old;}
+});

@@ -1,13 +1,12 @@
 ---
 import Base from "../../layouts/Base.astro";
-import FormScript from "../../components/FormScript.astro";
 import { SITE } from "../../config";
 
 const faq = [
   { q: "When do we pay?", a: "Only after a driver we sent starts driving for you. There is no retainer and no ad budget." },
   { q: "Who decides which drivers get hired?", a: "You do. We screen to your requirements, and you approve every driver before they move forward." },
   { q: "What positions do you recruit for?", a: "CDL-A company drivers, 1099 drivers, teams, lease to rent and lease to purchase, across dry van, reefer and open deck." },
-  { q: "How do we get started?", a: "Book a 15-minute call or send the short form on this page. Before we start recruiting, we ask you to fill out our carrier questionnaire so we know your lanes, equipment and hiring rules." },
+  { q: "How do we get started?", a: "Click Hire Drivers, find your company on FMCSA, answer a few questions about your fleet and pick a time for a 15-minute call. Before we start recruiting, we ask you to fill out our carrier questionnaire so we know your lanes, equipment and hiring rules." },
 ];
 const faqSchema = {
   "@context": "https://schema.org",
@@ -16,18 +15,19 @@ const faqSchema = {
 };
 ---
 <Base
-  title="Truck Driver Recruiting Agency | Pay-Per-Hire CDL-A Recruiting | Nexus Driver Solutions"
+  title="CDL Driver Recruiting Agency for Carriers | Nexus Driver Solutions"
   description="CDL-A driver recruiting for carriers. No retainer, no ad budget: screened drivers you approve, and you pay only when they start."
   schema={faqSchema}
 >
   <section class="band">
     <div class="wrap">
       <p class="mono-label">For carriers · Trusted by 30+ carriers</p>
-      <h1 class="display">You pay when the wheels turn.</h1>
+      <h1 class="display">CDL Driver Recruiting for Trucking Companies</h1>
+      <p class="slogan">You pay when the wheels turn.</p>
       <p>No retainer. No ad budget. No pile of applications nobody screened. We find CDL-A drivers who fit your lanes and hiring rules, you approve them, and our fee starts the day they start.</p>
       <div class="band__cta">
-        <a class="btn cta-white" href="#inquiry">Hire Drivers</a>
-        <a class="band__link" href={SITE.bookingUrl}>Book a 15-min call →</a>
+        <a class="btn cta-white" href={SITE.hireUrl}>Hire Drivers</a>
+        <span class="band__note">Starts with your FMCSA lookup · about 2 minutes</span>
       </div>
     </div>
   </section>
@@ -44,58 +44,20 @@ const faqSchema = {
     </div>
   </section>
 
-  <section class="section section--alt" id="inquiry">
-    <div class="wrap inquiry">
+  <section class="section section--alt" id="start">
+    <div class="wrap start">
       <div>
-        <p class="mono-label">Request drivers</p>
-        <h2 class="display inquiry__title">Tell us about your open seats.</h2>
-        <p class="inquiry__lede">Send the basics and we'll come back with next steps. Prefer to talk? <a href={SITE.bookingUrl}>Book a 15-minute call</a>.</p>
-        <div id="book-a-call" class="book">
-          <p class="mono-label">Book a call</p>
-          <p>Find your company on FMCSA, tell us about your fleet and the drivers you need, and pick a time.</p>
-          <a class="btn btn--line" href={SITE.bookingUrl}>Book a 15-min call</a>
-        </div>
+        <p class="mono-label">Hire drivers</p>
+        <h2 class="display start__title">Find your company. Tell us what you need. Pick a time.</h2>
       </div>
-
-      <form class="form card" data-nexus-form="carrier_inquiry" data-event="carrier_inquiry" data-success="Thanks. We'll reach out with next steps and our carrier questionnaire." novalidate>
-        <div class="form__row">
-          <div class="field"><label for="company">Company name</label><input id="company" name="company" autocomplete="organization" required /></div>
-          <div class="field"><label for="contact">Your name</label><input id="contact" name="contact_name" autocomplete="name" required /></div>
-        </div>
-        <div class="form__row">
-          <div class="field"><label for="mc">MC #</label><input id="mc" name="mc_number" inputmode="numeric" /></div>
-          <div class="field"><label for="dot">DOT #</label><input id="dot" name="dot_number" inputmode="numeric" required /></div>
-        </div>
-        <div class="form__row">
-          <div class="field"><label for="cphone">Phone</label><input id="cphone" name="phone" type="tel" autocomplete="tel" required /></div>
-          <div class="field"><label for="cemail">Email</label><input id="cemail" name="email" type="email" autocomplete="email" required /></div>
-        </div>
-        <div class="form__row">
-          <div class="field">
-            <label for="seats">Drivers needed</label>
-            <select id="seats" name="drivers_needed" required>
-              <option value="">Select</option><option>1–5</option><option>6–15</option><option>16–30</option><option>30+</option>
-            </select>
-          </div>
-          <div class="field">
-            <label for="ctrailer">Trailer type</label>
-            <select id="ctrailer" name="trailer" required>
-              <option value="">Select</option><option>Dry Van</option><option>Reefer</option><option>Open Deck</option><option>Multiple</option>
-            </select>
-          </div>
-        </div>
-        <div class="field">
-          <label for="positions">Positions you're hiring for</label>
-          <input id="positions" name="positions" placeholder="e.g. company solo, teams, lease to purchase" />
-        </div>
-        <div class="field">
-          <label for="notes">Lanes and requirements</label>
-          <textarea id="notes" name="notes" placeholder="Operating area, minimum experience, record requirements, home time…"></textarea>
-        </div>
-        <div class="hp" aria-hidden="true"><label>Company website<input name="company_website" tabindex="-1" autocomplete="off" /></label></div>
-        <button class="btn btn--dark" type="submit">Request drivers</button>
-        <p class="form-status" role="status" tabindex="-1" hidden></p>
-      </form>
+      <div>
+        <ol class="start__list">
+          <li>Look up your company on FMCSA by USDOT number or name.</li>
+          <li>Answer a few quick questions: fleet size, driver pay, trailers, escrow, truck year and the drivers you need.</li>
+          <li>Choose a day and time for a 15-minute call. We come to it already knowing your fleet.</li>
+        </ol>
+        <a class="btn btn--blue" href={SITE.hireUrl}>Hire Drivers</a>
+      </div>
     </div>
   </section>
 
@@ -112,13 +74,18 @@ const faqSchema = {
       </div>
     </div>
   </section>
-  <FormScript />
 </Base>
 
 <style>
   .band__cta { margin-top: 28px; display: flex; flex-wrap: wrap; align-items: center; gap: 14px 22px; }
   .cta-white { background: #fff; color: var(--navy); }
   .cta-white:hover { background: var(--sky); }
+  .slogan { font: 600 clamp(1.25rem, 2.2vw, 1.625rem)/1.2 var(--font-display); color: var(--sky) !important; margin-top: 14px !important; }
+  .band__note { color: rgb(255 255 255 / 0.65); font-size: 0.875rem; }
+  .start { display: grid; grid-template-columns: 5fr 6fr; gap: clamp(28px, 5vw, 72px); align-items: start; }
+  .start__title { font-size: clamp(2rem, 3.6vw, 3rem); margin-top: 12px; }
+  .start__list { margin: 0 0 28px; padding-left: 22px; display: grid; gap: 12px; color: var(--ink-2); }
+  @media (max-width: 960px) { .start { grid-template-columns: 1fr; } }
   .band__link { color: #fff; font-weight: 600; text-decoration: none; border-bottom: 2px solid var(--sky); padding-bottom: 2px; }
   .band__link:hover { color: var(--sky); }
 

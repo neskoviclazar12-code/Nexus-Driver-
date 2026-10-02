@@ -1,0 +1,47 @@
+---
+import { CATEGORIES, DIVISIONS, jobsIn, maxCpm, maxLeasePct } from "../data/jobs";
+import { SITE } from "../config";
+interface Props { current?: string }
+const { current } = Astro.props;
+const cards = CATEGORIES.map((c) => {
+  const count = jobsIn(c.key).length;
+  let rows: { label: string; value: string }[] = [];
+  if (c.key === "company") rows = DIVISIONS.filter((d) => maxCpm(d) > 0).map((d) => ({ label: d, value: `up to ${maxCpm(d)} CPM` }));
+  else {
+    const pct = maxLeasePct(c.key) || SITE.categoryClaims[c.key] || 0;
+    if (pct) rows = [{ label: c.key === "lease" ? "Driver share" : "Of gross", value: `up to ${pct}%` }];
+  }
+  return { ...c, count, rows };
+});
+---
+<ul class="cats" aria-label="Job categories">
+  {cards.map((c) => (
+    <li class={`cat${current === c.slug ? " cat--on" : ""}`}>
+      <a href={`/cdl-jobs/${c.slug}/`} aria-current={current === c.slug ? "page" : undefined}>
+        <span class="cat__label">{c.label}</span>
+        <span class="cat__rows">
+          {c.rows.map((r) => <span class="cat__row"><span>{r.label}</span><strong>{r.value}</strong></span>)}
+        </span>
+        <span class="cat__foot">{c.count > 0 ? `${c.count} open ${c.count === 1 ? "job" : "jobs"}` : "Ask a recruiter"} →</span>
+      </a>
+    </li>
+  ))}
+</ul>
+
+<style>
+  .cats { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+  .cat a {
+    display: flex; flex-direction: column; gap: 14px; height: 100%; padding: 22px;
+    background: #fff; color: var(--ink); text-decoration: none;
+    border: 1px solid var(--line); border-top: 3px solid var(--navy); border-radius: var(--radius);
+    transition: border-color 160ms ease, transform 160ms ease;
+  }
+  .cat a:hover { border-color: var(--blue); transform: translateY(-2px); }
+  .cat--on a { border-color: var(--blue); border-top-color: var(--blue); box-shadow: 0 0 0 1px var(--blue); }
+  .cat__label { font: 600 1.375rem/1.15 var(--font-display); letter-spacing: -0.02em; }
+  .cat__rows { display: grid; gap: 6px; }
+  .cat__row { display: flex; justify-content: space-between; gap: 12px; padding-bottom: 6px; border-bottom: 1px dashed var(--line); font-size: 0.9375rem; color: var(--ink-2); }
+  .cat__row strong { color: var(--blue); font-variant-numeric: tabular-nums; }
+  .cat__foot { margin-top: auto; font-weight: 600; font-size: 0.875rem; color: var(--royal); }
+  @media (max-width: 860px) { .cats { grid-template-columns: 1fr; } }
+</style>

@@ -19,8 +19,18 @@ export type Position =
 
 export type Division = "Dry Van" | "Reefer" | "Open Deck";
 
+export type Category = "company" | "owner-operator" | "lease";
+
+export interface JobLocation { city?: string; state?: string; country: "US" }
+
 export interface Job {
   slug: string;
+  id: string;               // internal job ID (schema.org identifier)
+  schemaTitle: string;      // plain job title for Google (no pay, no company)
+  category: Category;       // job board group
+  cpm?: Partial<Record<Division, number>>; // max solo CPM per trailer (company jobs), e.g. { "Dry Van": 80 }
+  leasePct?: number;        // max driver % of gross (lease / O/O jobs)
+  locations: JobLocation[]; // where the driver reports (terminal / orientation), kept general
   active: boolean;
   title: string;            // job page H1
   carrierLabel: string;     // anonymous carrier description
@@ -42,6 +52,11 @@ export interface Job {
 export const jobs: Job[] = [
   {
     slug: "otr-dry-van-company-driver-up-to-80-cpm",
+    id: "NEX-001", // TODO: confirm reporting location (Chicago area assumed)
+    schemaTitle: "OTR CDL-A Company Driver",
+    category: "company",
+    cpm: { "Dry Van": 80 },
+    locations: [{ city: "Chicago", state: "IL", country: "US" }],
     active: true,
     title: "OTR Dry Van Company Driver: Up to 80 CPM Solo, 90 CPM Team",
     carrierLabel: "Midwest dry van carrier",
@@ -72,6 +87,11 @@ export const jobs: Job[] = [
   },
   {
     slug: "otr-1099-driver-dry-van-reefer-open-deck-up-to-1-cpm",
+    id: "NEX-002",
+    schemaTitle: "OTR CDL-A Independent Contractor Driver",
+    category: "company",
+    cpm: { "Dry Van": 75, "Reefer": 78, "Open Deck": 80 },
+    locations: [{ city: "Chicago", state: "IL", country: "US" }],
     active: true,
     title: "OTR 1099 Driver: Dry Van, Reefer, Open Deck & Team, Up to $1 CPM",
     carrierLabel: "Illinois-based OTR carrier",
@@ -102,6 +122,11 @@ export const jobs: Job[] = [
   },
   {
     slug: "lease-to-rent-dry-van-reefer-open-deck-88-percent",
+    id: "NEX-003",
+    schemaTitle: "CDL-A Lease to Rent Driver",
+    category: "lease",
+    leasePct: 88,
+    locations: [{ city: "Chicago", state: "IL", country: "US" }],
     active: true,
     title: "Lease to Rent: 88% of Gross, Dry Van, Reefer & Open Deck",
     carrierLabel: "Illinois-based OTR carrier",
@@ -130,6 +155,11 @@ export const jobs: Job[] = [
   },
   {
     slug: "otr-dry-van-company-driver-70-80-cpm-new-cascadia",
+    id: "NEX-004",
+    schemaTitle: "OTR CDL-A Company Driver",
+    category: "company",
+    cpm: { "Dry Van": 80 },
+    locations: [{ city: "Chicago", state: "IL", country: "US" }],
     active: true,
     title: "OTR Dry Van Company Driver: 70–80 CPM, 2025–2027 Cascadia",
     carrierLabel: "Chicago-area dry van carrier",
@@ -159,6 +189,11 @@ export const jobs: Job[] = [
   },
   {
     slug: "otr-dry-van-company-team-driver-up-to-83-cpm",
+    id: "NEX-005",
+    schemaTitle: "OTR CDL-A Company Driver",
+    category: "company",
+    cpm: { "Dry Van": 83 },
+    locations: [{ city: "Chicago", state: "IL", country: "US" }],
     active: true,
     title: "OTR Dry Van Company & Team Driver: Up to 83 CPM, Team to $1.05",
     carrierLabel: "Chicago-area dry van carrier",
@@ -188,6 +223,10 @@ export const jobs: Job[] = [
   },
   {
     slug: "lease-to-rent-dry-van-900-week-usps",
+    id: "NEX-006",
+    schemaTitle: "CDL-A Lease to Rent Driver",
+    category: "lease",
+    locations: [{ city: "Chicago", state: "IL", country: "US" }],
     active: true,
     title: "Lease to Rent Dry Van: $900/Week Truck, USPS Mail Loads",
     carrierLabel: "Chicago-area dry van carrier",
@@ -215,6 +254,11 @@ export const jobs: Job[] = [
   },
   {
     slug: "otr-dry-van-company-driver-70-75-cpm",
+    id: "NEX-007",
+    schemaTitle: "OTR CDL-A Company Driver",
+    category: "company",
+    cpm: { "Dry Van": 75 },
+    locations: [{ state: "IN", country: "US" }],
     active: true,
     title: "OTR Dry Van Company Driver: 70–75 CPM, $2,500 Average Week",
     carrierLabel: "Indiana-based dry van carrier",
@@ -241,6 +285,11 @@ export const jobs: Job[] = [
   },
   {
     slug: "otr-reefer-open-deck-dry-van-driver-up-to-90-cpm",
+    id: "NEX-008",
+    schemaTitle: "OTR CDL-A Company Driver",
+    category: "company",
+    cpm: { "Dry Van": 80, "Reefer": 82, "Open Deck": 90 },
+    locations: [{ city: "Chicago", state: "IL", country: "US" }],
     active: true,
     title: "OTR Open Deck, Reefer & Dry Van Driver: Up to 90 CPM or 30% of Gross",
     carrierLabel: "Illinois-based OTR carrier",
@@ -260,7 +309,7 @@ export const jobs: Job[] = [
       { label: "Dry Van", value: "Up to 80 CPM or 28% of gross" },
     ],
     sections: [
-      { title: "Pay", items: ["All miles paid, loaded and empty", "Weekly direct deposit", "Extra stop $50 · Tarp $50", "Detention $25/hr (3 hr min) · Layover $100/24 hrs"] },
+      { title: "Pay", items: ["All miles paid, loaded and empty", "Weekly direct deposit, 1099 independent contractor", "Extra stop $50 · Tarp $50", "Detention $25/hr (3 hr min) · Layover $100/24 hrs"] },
       { title: "Home time", items: ["3 weeks out = 3 days home", "4 weeks out = 4 days home (reefer, FL/NA)", "Passengers 18+ and pets allowed"] },
       { title: "Truck", items: ["2022–2026 Cascadia, automatic, governed 68 mph", "APU, fridge, inverter, dual dash cameras", "Samsara ELD, Love's fuel card, I-Pass"] },
       { title: "Requirements", items: ["8+ months CDL-A, valid medical card, FEIN/EIN", "Max 1 at-fault accident and 3 moving violations in 3 years", "No SAP, DUI, criminal record or truck abandonment"] },
@@ -271,6 +320,11 @@ export const jobs: Job[] = [
   },
   {
     slug: "otr-dry-van-company-driver-75-cpm",
+    id: "NEX-009",
+    schemaTitle: "OTR CDL-A Company Driver",
+    category: "company",
+    cpm: { "Dry Van": 75 },
+    locations: [{ city: "Chicago", state: "IL", country: "US" }],
     active: true,
     title: "OTR Dry Van Company Driver: 75 CPM, No Downtown Deliveries",
     carrierLabel: "Chicago-area dry van carrier",
@@ -297,6 +351,11 @@ export const jobs: Job[] = [
   },
   {
     slug: "lease-to-purchase-dry-van-88-12",
+    id: "NEX-010", // TODO: add reporting city/state when known
+    schemaTitle: "CDL-A Lease Purchase Driver",
+    category: "lease",
+    leasePct: 88,
+    locations: [{ country: "US" }],
     active: true,
     title: "Lease to Purchase Dry Van: 88/12 Split, $750/Week Truck",
     carrierLabel: "Dry van carrier",
@@ -333,4 +392,15 @@ export const featured = [
 ];
 
 export const activeJobs = () => jobs.filter((j) => j.active);
+
+/** Job board groups. Rates are computed from the active jobs, so they stay true. */
+export const CATEGORIES: { key: Category; slug: string; label: string; note: string }[] = [
+  { key: "company", slug: "company-driver", label: "Company Driver", note: "W-2 and 1099 company drivers in the carrier's truck" },
+  { key: "owner-operator", slug: "owner-operator", label: "Owner Operator", note: "Your truck, your authority or lease-on" },
+  { key: "lease", slug: "lease-purchase", label: "Lease Purchase & Lease to Rent", note: "Drive a carrier truck on a lease, with a path to own" },
+];
+export const DIVISIONS: Division[] = ["Dry Van", "Reefer", "Open Deck"];
+export const jobsIn = (c: Category) => activeJobs().filter((j) => j.category === c);
+export const maxCpm = (d: Division) => Math.max(0, ...jobsIn("company").map((j) => j.cpm?.[d] ?? 0));
+export const maxLeasePct = (c: Category) => Math.max(0, ...jobsIn(c).map((j) => j.leasePct ?? 0));
 export const jobBySlug = (slug: string) => jobs.find((j) => j.slug === slug);

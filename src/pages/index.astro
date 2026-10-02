@@ -28,8 +28,8 @@ const total = activeJobs().length;
           <li><strong>You approve every driver.</strong> Nothing gets submitted without your yes.</li>
         </ul>
         <div class="carriers__cta">
-          <a class="btn btn--blue" href="/carriers/">Hire Drivers</a>
-          <a class="carriers__link" href={SITE.bookingUrl}>Book a 15-min call →</a>
+          <a class="btn btn--blue" href={SITE.hireUrl}>Hire Drivers</a>
+          <a class="carriers__link" href="/carriers/">How CDL driver recruiting works →</a>
         </div>
       </div>
     </div>
@@ -38,7 +38,7 @@ const total = activeJobs().length;
 
 
   <section class="section about" id="about">
-    <div class="wrap about__grid"><div><p class="mono-label">The people between the application and the first load</p><h2 class="display">Recruiting is personal.<br/>So is our approach.</h2></div><div><p>Nexus Driver Solutions connects CDL-A drivers with carriers across the United States. We bring the driver's experience and priorities together with the carrier's routes and hiring requirements.</p><p>From the first conversation through application follow-up and orientation coordination, our team helps both sides understand what comes next.</p><a class="about__contact" href={`mailto:${SITE.email}`}>Talk to the Nexus team ↗</a></div></div>
+    <div class="wrap about__grid"><div><p class="mono-label">The people between the application and the first load</p><h2 class="display">Recruiting is personal.<br/>So is our approach.</h2></div><div><p>Nexus Driver Solutions connects CDL-A drivers with carriers across the United States. We bring the driver's experience and priorities together with the carrier's routes and hiring requirements.</p><p>From the first conversation through application follow-up and orientation coordination, our team helps both sides understand what comes next.</p><a class="about__contact" href="/about/">More about Nexus Driver Solutions →</a></div></div>
   </section>
   <!-- Drivers: how it works -->
   <section class="section" aria-labelledby="how-title">
@@ -89,7 +89,7 @@ const total = activeJobs().length;
       <h2 class="display final__title">Ready when you are.</h2>
       <div class="final__cta">
         <a class="btn btn--dark" href="/apply/">Apply as a driver</a>
-        <a class="btn btn--line" href="/carriers/#inquiry">Request drivers</a>
+        <a class="btn btn--line" href={SITE.hireUrl}>Hire Drivers</a>
       </div>
     </div>
   </section>

@@ -16,26 +16,35 @@ const related = activeJobs()
   .slice(0, 3);
 
 const validThrough = new Date(new Date(job.datePosted).getTime() + 60 * 864e5).toISOString().slice(0, 10);
-const employmentType = job.positions.some((p) => p.startsWith("Lease") || p === "Independent Contractor")
+// 1099 and lease positions are contractor roles.
+const is1099 = JSON.stringify(job.sections).includes("1099") || job.summary.includes("1099");
+const employmentType = is1099 || job.positions.some((p) => p.startsWith("Lease") || p === "Independent Contractor")
   ? "CONTRACTOR"
   : "FULL_TIME";
 
 const jobSchema = {
   "@context": "https://schema.org",
   "@type": "JobPosting",
-  title: job.title,
+  // Plain job title only: no pay, no company (Google guideline)
+  title: job.schemaTitle,
   description: `<p>${job.summary}</p>` + job.sections.map((s) => `<h3>${s.title}</h3><ul>${s.items.map((i) => `<li>${i}</li>`).join("")}</ul>`).join(""),
+  identifier: { "@type": "PropertyValue", name: SITE.name, value: job.id },
   datePosted: job.datePosted,
   validThrough,
   employmentType,
-  // Carrier name is kept confidential, so the posting is listed under Nexus.
-  hiringOrganization: { "@type": "Organization", name: SITE.name, sameAs: SITE.url },
-  jobLocation: {
+  // The carrier is kept anonymous on this site; Google allows "confidential" for that case.
+  hiringOrganization: { "@type": "Organization", name: "confidential" },
+  jobLocation: job.locations.map((l) => ({
     "@type": "Place",
-    address: { "@type": "PostalAddress", addressRegion: job.region === "US" ? undefined : job.region, addressCountry: "US" },
-  },
-  applicantLocationRequirements: { "@type": "Country", name: "USA" },
-  directApply: true,
+    address: {
+      "@type": "PostalAddress",
+      ...(l.city ? { addressLocality: l.city } : {}),
+      ...(l.state ? { addressRegion: l.state } : {}),
+      addressCountry: l.country,
+    },
+  })),
+  // Our form is a short pre-application; drivers complete the carrier's application afterwards.
+  directApply: false,
   industry: "Trucking",
   occupationalCategory: "53-3032.00 Heavy and Tractor-Trailer Truck Drivers",
 };
@@ -50,7 +59,7 @@ const crumbs = {
 };
 ---
 <Base
-  title={`${job.title} | Nexus Driver Solutions`}
+  title={`${job.schemaTitle}: ${job.headline} | Nexus`}
   description={`${job.headline}. ${job.summary}`.slice(0, 158)}
   schema={[jobSchema, crumbs]}
 >

@@ -36,6 +36,15 @@ Official setup references:
 - https://resend.com/docs/api-reference/emails/send-batch-emails
 - https://vercel.com/docs/functions/runtimes/node-js
 
+## SEO setup (v5)
+
+- Primary domain is **https://www.nexusdrivers.com**. `vercel.json` sends nexusdrivers.com → www (301). In Vercel → Domains, also set www as the primary domain.
+- Old `/carriers/book-a-call/` redirects (301) to `/hire-drivers/`, the single carrier sign-up flow.
+- Job schema follows Google's JobPosting rules: hiringOrganization "confidential", a plain `schemaTitle` (no pay), `identifier`, `jobLocation` per job, `directApply: false`, and no `baseSalary` (pay on our pages is an average, not the employer's base salary).
+- **Google Indexing API:** in Google Cloud, enable "Web Search Indexing API", create a service account and a JSON key, and add the service account email as an **Owner** in Search Console. Then add the JSON as GitHub secret `GOOGLE_INDEXING_KEY`. After each production deploy, `.github/workflows/google-indexing.yml` sends URL_UPDATED for active jobs and URL_DELETED for jobs with `active: false`. Manual run: `GOOGLE_INDEXING_KEY='…' npm run google-indexing`.
+- **Search Console:** add a Domain property `nexusdrivers.com` (DNS TXT at GoDaddy), then submit `sitemap-index.xml`.
+- **Job categories:** each job has `category` (company / owner-operator / lease). Company jobs carry `cpm` per trailer. Category rates are computed from active jobs. The owner operator "up to 90%" comes from `SITE.categoryClaims` until an owner operator job is added. That page is noindex and out of the sitemap while it has no jobs.
+
 ## Changes
 
 - Oct 2026: new NEXUS wordmark (header/footer) and X-symbol favicon; lighter headline type (Urbane DemiBold instead of Sublima ExtraBold); "Trusted by 30+ carriers"; 9-step "Book a 15-min call" flow with FMCSA lookup (`api/fmcsa.js`) sent as a `call_request` email.

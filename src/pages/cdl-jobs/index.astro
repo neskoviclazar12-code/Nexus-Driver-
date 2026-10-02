@@ -1,15 +1,15 @@
 ---
 import Base from "../../layouts/Base.astro";
 import JobCard from "../../components/JobCard.astro";
-import { activeJobs } from "../../data/jobs";
+import CategoryCards from "../../components/CategoryCards.astro";
+import { activeJobs, CATEGORIES } from "../../data/jobs";
 
 const list = activeJobs();
-const positions = [...new Set(list.flatMap((j) => j.positions))];
 const divisions = [...new Set(list.flatMap((j) => j.divisions))];
 ---
 <Base
-  title="CDL-A Jobs: Company Driver, 1099, Lease to Rent & Lease Purchase | Nexus Driver Solutions"
-  description="Open CDL-A truck driving jobs with pay, home time and equipment shown up front. Dry van, reefer and open deck. Company driver, 1099 and lease positions."
+  title="CDL-A Truck Driving Jobs | Nexus Driver Solutions"
+  description="CDL-A truck driving jobs with pay, home time and equipment shown up front. Company driver, owner operator and lease purchase jobs in dry van, reefer and open deck."
 >
   <section class="band">
     <div class="wrap">
@@ -21,12 +21,14 @@ const divisions = [...new Set(list.flatMap((j) => j.divisions))];
 
   <section class="section section--alt">
     <div class="wrap">
+      <CategoryCards />
+      <h2 class="all-title">All open CDL-A jobs</h2>
       <form class="filters" aria-label="Filter jobs" onsubmit="return false">
         <fieldset>
-          <legend class="mono-label">Position</legend>
+          <legend class="mono-label">Job type</legend>
           <div class="chips">
             <label><input type="radio" name="position" value="" checked /> <span>All</span></label>
-            {positions.map((p) => <label><input type="radio" name="position" value={p} /> <span>{p}</span></label>)}
+            {CATEGORIES.map((c) => <label><input type="radio" name="position" value={c.key} /> <span>{c.label}</span></label>)}
           </div>
         </fieldset>
         <fieldset>
@@ -63,7 +65,7 @@ const divisions = [...new Set(list.flatMap((j) => j.divisions))];
     let shown = 0;
     for (const c of cards) {
       const ok =
-        (!pos || (c.dataset.positions || "").split("|").includes(pos)) &&
+        (!pos || c.dataset.category === pos) &&
         (!div || (c.dataset.divisions || "").split("|").includes(div));
       c.hidden = !ok;
       if (ok) shown++;
@@ -71,7 +73,7 @@ const divisions = [...new Set(list.flatMap((j) => j.divisions))];
     count.textContent = String(shown);
     empty.hidden = shown !== 0;
     const params = new URLSearchParams();
-    if (pos) params.set("position", pos);
+    if (pos) params.set("type", pos);
     if (div) params.set("trailer", div);
     history.replaceState(null, "", params.toString() ? `?${params}` : location.pathname);
   }
@@ -83,7 +85,7 @@ const divisions = [...new Set(list.flatMap((j) => j.divisions))];
     const el = form.querySelector<HTMLInputElement>(`input[name="${name}"][value="${CSS.escape(value)}"]`);
     if (el) el.checked = true;
   };
-  setRadio("position", url.get("position"));
+  setRadio("position", url.get("type"));
   setRadio("division", url.get("trailer"));
 
   form.addEventListener("change", apply);
@@ -91,6 +93,7 @@ const divisions = [...new Set(list.flatMap((j) => j.divisions))];
 </script>
 
 <style>
+  .all-title { font: 600 1.75rem/1.15 var(--font-display); letter-spacing: -0.02em; margin: 56px 0 20px; }
   .filters { display: flex; flex-wrap: wrap; gap: 20px 40px; margin-bottom: 24px; }
   fieldset { border: 0; margin: 0; padding: 0; }
   legend { margin-bottom: 10px; padding: 0; }

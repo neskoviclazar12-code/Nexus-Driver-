@@ -1,14 +1,16 @@
 ---
-import type { Job } from "../data/jobs";
+import { CATEGORIES, type Job } from "../data/jobs";
 interface Props { job: Job }
 const { job } = Astro.props;
+const catLabel = CATEGORIES.find((c) => c.key === job.category)?.label ?? job.positions[0];
 ---
 <article
   class="jc"
+  data-category={job.category}
   data-positions={job.positions.join("|")}
   data-divisions={job.divisions.join("|")}
 >
-  <p class="jc__tags mono-label">{job.divisions.join(" · ")} · {job.positions[0]}</p>
+  <p class="jc__tags mono-label">{catLabel} · {job.divisions.join(" · ")}</p>
   <h3 class="jc__title"><a href={`/cdl-jobs/${job.slug}/`}>{job.headline}</a></h3>
   <p class="jc__sub">{job.title.split(":")[0]}</p>
   <dl class="jc__facts">

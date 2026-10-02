@@ -1,0 +1,12 @@
+---
+import CategoryPage from "../../components/CategoryPage.astro";
+import { SITE } from "../../config";
+const pct = SITE.categoryClaims["owner-operator"];
+---
+<CategoryPage
+  category="owner-operator"
+  title="Owner Operator CDL-A Jobs | Nexus Driver Solutions"
+  description={`Owner operator opportunities with carriers paying up to ${pct}% of gross. Tell us about your truck and lanes and a Nexus recruiter will match you.`}
+  h1="Owner Operator Jobs"
+  intro={`Bring your own truck and keep up to ${pct}% of the gross. Tell us your equipment and lanes, and we match you with carriers that fit.`}
+/>

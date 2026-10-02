@@ -1,0 +1,12 @@
+---
+import CategoryPage from "../../components/CategoryPage.astro";
+import { maxLeasePct } from "../../data/jobs";
+const pct = maxLeasePct("lease");
+---
+<CategoryPage
+  category="lease"
+  title="Lease Purchase & Lease to Rent CDL-A Jobs | Nexus"
+  description={`Lease purchase and lease to rent trucking jobs with up to ${pct}% of gross to the driver. Weekly truck payment and every cost listed up front.`}
+  h1="Lease Purchase & Lease to Rent Jobs"
+  intro={`Keep up to ${pct}% of the gross in a carrier truck, with a path to own it. Truck payment, insurance, escrow and every weekly cost are listed before you apply.`}
+/>

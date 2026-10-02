@@ -1,0 +1,12 @@
+---
+import CategoryPage from "../../components/CategoryPage.astro";
+import { maxCpm } from "../../data/jobs";
+const dv = maxCpm("Dry Van"), rf = maxCpm("Reefer"), od = maxCpm("Open Deck");
+---
+<CategoryPage
+  category="company"
+  title="CDL-A Company Driver Jobs: Dry Van, Reefer, Open Deck | Nexus"
+  description={`CDL-A company driver jobs. Dry van up to ${dv} CPM, reefer up to ${rf} CPM, open deck up to ${od} CPM. Pay, home time and truck listed before you apply.`}
+  h1="CDL-A Company Driver Jobs"
+  intro={`Drive the carrier's truck. Dry van up to ${dv} CPM, reefer up to ${rf} CPM and open deck up to ${od} CPM, with home time and equipment on every listing.`}
+/>

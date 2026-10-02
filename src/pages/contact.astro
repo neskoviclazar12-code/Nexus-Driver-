@@ -1,0 +1,66 @@
+---
+import Base from "../layouts/Base.astro";
+import FormScript from "../components/FormScript.astro";
+import { SITE } from "../config";
+const crumbs = { "@context": "https://schema.org", "@type": "BreadcrumbList", itemListElement: [
+  { "@type": "ListItem", position: 1, name: "Home", item: SITE.url + "/" },
+  { "@type": "ListItem", position: 2, name: "Contact", item: SITE.url + "/contact/" } ] };
+const contactPage = { "@context": "https://schema.org", "@type": "ContactPage", name: "Contact Nexus Driver Solutions", url: SITE.url + "/contact/" };
+---
+<Base title="Contact Nexus Driver Solutions | CDL Driver Recruiting" description="Contact Nexus Driver Solutions. Carriers can start hiring CDL-A drivers, drivers can apply for CDL-A jobs, or send us a message at info@nexusdrivers.com." schema={[contactPage, crumbs]}>
+  <section class="band">
+    <div class="wrap">
+      <p class="mono-label">Contact</p>
+      <h1 class="display">Contact Nexus Driver Solutions</h1>
+      <p>Hiring drivers or looking for a seat? The fastest way is below. For anything else, send a message.</p>
+    </div>
+  </section>
+
+  <section class="section section--alt">
+    <div class="wrap contact">
+      <div class="routes">
+        <a class="route" href={SITE.hireUrl}><span class="mono-label">Carriers</span><strong>Hire CDL-A drivers</strong><span>Find your company on FMCSA and pick a time for a 15-minute call.</span></a>
+        <a class="route" href="/apply/"><span class="mono-label">Drivers</span><strong>Apply for CDL-A jobs</strong><span>Two minutes, no resume. A recruiter calls you back.</span></a>
+        <div class="route route--info">
+          <span class="mono-label">Company</span>
+          <strong>{SITE.legalName}</strong>
+          <span>{SITE.address.street}<br />{SITE.address.city}, {SITE.address.region} {SITE.address.zip}</span>
+          <a href={`mailto:${SITE.email}`}>{SITE.email}</a>
+          <a href={SITE.instagram} target="_blank" rel="noopener">Instagram @_nexusds</a>
+        </div>
+      </div>
+
+      <form class="form card" data-nexus-form="general_message" data-event="contact_message" novalidate>
+        <h2 class="card__title">Send a message</h2>
+        <div class="form__row">
+          <div class="field"><label for="g-name">Name</label><input id="g-name" name="name" autocomplete="name" required /></div>
+          <div class="field"><label for="g-email">Email</label><input id="g-email" name="email" type="email" autocomplete="email" required /></div>
+        </div>
+        <div class="form__row">
+          <div class="field"><label for="g-phone">Phone (optional)</label><input id="g-phone" name="phone" type="tel" autocomplete="tel" /></div>
+          <div class="field">
+            <label for="g-who">I am a</label>
+            <select id="g-who" name="role" required><option value="">Select</option><option>Carrier</option><option>Driver</option><option>Other</option></select>
+          </div>
+        </div>
+        <div class="field"><label for="g-msg">Message</label><textarea id="g-msg" name="message" required></textarea></div>
+        <div class="hp" aria-hidden="true"><label>Company website<input name="company_website" tabindex="-1" autocomplete="off" /></label></div>
+        <button class="btn btn--dark" type="submit">Send message</button>
+        <p class="form-status" role="status" tabindex="-1" hidden></p>
+      </form>
+    </div>
+  </section>
+  <FormScript />
+</Base>
+<style>
+  .contact { display: grid; grid-template-columns: 5fr 7fr; gap: clamp(28px, 5vw, 64px); align-items: start; }
+  .routes { display: grid; gap: 14px; }
+  .route { display: grid; gap: 6px; padding: 20px; background: #fff; border: 1px solid var(--line); border-radius: var(--radius); color: var(--ink-2); text-decoration: none; font-size: 0.9375rem; }
+  a.route:hover { border-color: var(--blue); }
+  .route strong { color: var(--ink); font: 600 1.25rem/1.2 var(--font-display); }
+  .route .mono-label { margin: 0; }
+  .card { background: #fff; border: 1px solid var(--line); border-radius: var(--radius); padding: clamp(20px, 4vw, 36px); }
+  .card__title { margin: 0; font: 600 1.5rem/1.2 var(--font-display); }
+  .card .btn { justify-self: start; }
+  @media (max-width: 960px) { .contact { grid-template-columns: 1fr; } .card .btn { width: 100%; } }
+</style>

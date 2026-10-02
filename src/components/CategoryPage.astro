@@ -1,0 +1,75 @@
+---
+import Base from "../layouts/Base.astro";
+import JobCard from "./JobCard.astro";
+import CategoryCards from "./CategoryCards.astro";
+import { CATEGORIES, DIVISIONS, jobsIn, maxCpm, type Category, type Division } from "../data/jobs";
+import { SITE } from "../config";
+
+interface Props { category: Category; title: string; description: string; h1: string; intro: string }
+const { category, title, description, h1, intro } = Astro.props;
+const cat = CATEGORIES.find((c) => c.key === category)!;
+const list = jobsIn(category);
+
+// Company jobs are grouped by trailer and sorted by that trailer's CPM.
+const groups: { division?: Division; heading: string; jobs: typeof list }[] =
+  category === "company"
+    ? DIVISIONS.filter((d) => maxCpm(d) > 0).map((d) => ({
+        division: d,
+        heading: `${d} company driver jobs, up to ${maxCpm(d)} CPM`,
+        jobs: list.filter((j) => j.cpm?.[d]).sort((a, b) => (b.cpm?.[d] ?? 0) - (a.cpm?.[d] ?? 0)),
+      }))
+    : [{ heading: `${cat.label} jobs`, jobs: list }];
+
+const crumbs = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Home", item: SITE.url + "/" },
+    { "@type": "ListItem", position: 2, name: "CDL-A Jobs", item: SITE.url + "/cdl-jobs/" },
+    { "@type": "ListItem", position: 3, name: cat.label, item: `${SITE.url}/cdl-jobs/${cat.slug}/` },
+  ],
+};
+---
+<Base title={title} description={description} schema={crumbs} noindex={list.length === 0}>
+  <section class="band">
+    <div class="wrap">
+      <nav class="crumbs" aria-label="Breadcrumb"><a href="/cdl-jobs/">← All CDL-A jobs</a></nav>
+      <p class="mono-label">{list.length} open · {cat.note}</p>
+      <h1 class="display">{h1}</h1>
+      <p>{intro}</p>
+    </div>
+  </section>
+
+  <section class="section section--alt">
+    <div class="wrap">
+      <CategoryCards current={cat.slug} />
+
+      {list.length === 0 ? (
+        <div class="empty">
+          <h2 class="display">No open {cat.label.toLowerCase()} listing right now.</h2>
+          <p>New {cat.label.toLowerCase()} opportunities come in regularly. Apply once and a recruiter will reach out when one fits your truck, lanes and experience.</p>
+          <a class="btn btn--dark" href="/apply/">Apply as a driver</a>
+        </div>
+      ) : groups.map((g) => (
+        <div class="group">
+          <h2 class="group__title">{g.heading}</h2>
+          <div class="grid">{g.jobs.map((j) => <JobCard job={j} />)}</div>
+        </div>
+      ))}
+    </div>
+  </section>
+</Base>
+
+<style>
+  .crumbs { margin-bottom: 18px; }
+  .crumbs a { color: rgb(255 255 255 / 0.75); text-decoration: none; font-size: 0.9375rem; }
+  .crumbs a:hover { color: #fff; }
+  .group { margin-top: 48px; }
+  .group__title { font: 600 1.625rem/1.15 var(--font-display); letter-spacing: -0.02em; margin: 0 0 18px; }
+  .grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; }
+  .empty { margin-top: 40px; padding: 32px; background: #fff; border: 1px dashed var(--line); border-radius: var(--radius); }
+  .empty h2 { font-size: 1.75rem; }
+  .empty p { color: var(--ink-2); max-width: 40rem; }
+  @media (max-width: 960px) { .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (max-width: 640px) { .grid { grid-template-columns: 1fr; } }
+</style>

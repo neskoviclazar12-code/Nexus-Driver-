@@ -1,0 +1,485 @@
+---
+import Base from "../layouts/Base.astro";
+import { SITE } from "../config";
+
+const fleet = ["1–5 trucks", "6–10 trucks", "11–19 trucks", "20–50 trucks", "51–100 trucks", "101–200 trucks", "200+ trucks"];
+const cpm = ["Under 70¢", "70¢", "72–75¢", "80¢", "85¢", "90¢+"];
+const gross = ["25%", "28%", "30%", "88% / 12% (lease)"];
+const trailers = ["Dry van", "Reefer", "Flatbed", "Step deck"];
+const years = ["Older than 2020", "2020–2022", "2023–2025", "2026–2027"];
+const positions = ["Company drivers (solo)", "Team drivers", "1099 / independent contractors", "Lease to rent", "Lease to purchase", "Owner operators"];
+const needed = ["1–2", "3–5", "6–10", "11–20", "20+"];
+const times = ["8–10 AM", "10 AM–12 PM", "12–2 PM", "2–4 PM", "4–6 PM"];
+const zones = ["Central", "Eastern", "Mountain", "Pacific"];
+const TOTAL = 9;
+---
+<Base
+  title="Hire CDL Drivers | Nexus Driver Solutions"
+  description="Hire CDL-A drivers with Nexus Driver Solutions. Find your company on FMCSA, tell us about your fleet and the drivers you need, and pick a time for a call."
+>
+  <section class="book-band">
+    <div class="wrap">
+      <p class="eyebrow"><span class="dash" aria-hidden="true"></span>Hire drivers · 15-min call</p>
+      <h1 class="display">Two minutes here saves twenty on the phone.</h1>
+      <p>Find your company on FMCSA, tell us how you run, and pick a time. We come to the call already knowing your fleet.</p>
+    </div>
+  </section>
+
+  <section class="book-area">
+    <div class="wrap">
+      <form class="wiz" id="wiz" novalidate>
+        <div class="wiz__top">
+          <p class="wiz__label">Carrier sign-up</p>
+          <p class="wiz__count"><span id="step-n">1</span> / {TOTAL}</p>
+        </div>
+        <div class="wiz__bar" aria-hidden="true"><span id="bar"></span></div>
+
+        <!-- 1. FMCSA -->
+        <fieldset class="step" data-step="1">
+          <legend class="q">Find your company on FMCSA</legend>
+          <p class="hint">Search by USDOT number, MC number or company name.</p>
+          <div class="search">
+            <label class="sr" for="fm-q">DOT, MC or company name</label>
+            <input id="fm-q" type="search" placeholder="e.g. 1234567, MC 123456 or company name" autocomplete="off" />
+            <button type="button" class="btn btn--dark" id="fm-go">Search</button>
+          </div>
+          <p class="fm-msg" id="fm-msg" role="status"></p>
+          <div class="results" id="fm-results"></div>
+          <p class="hint small">
+            Prefer to look it up yourself? <a href="https://safer.fmcsa.dot.gov/CompanySnapshot.aspx" target="_blank" rel="noopener">Open FMCSA SAFER ↗</a>
+          </p>
+          <div class="manual" id="fm-manual" hidden>
+            <div class="form__row">
+              <div class="field"><label for="m-company">Company name</label><input id="m-company" autocomplete="organization" /></div>
+              <div class="field"><label for="m-dot">USDOT #</label><input id="m-dot" inputmode="numeric" pattern="\d{1,8}" /></div>
+            </div>
+            <div class="field"><label for="m-mc">MC # (optional)</label><input id="m-mc" inputmode="numeric" /></div>
+          </div>
+          <div class="picked" id="fm-picked" hidden></div>
+        </fieldset>
+
+        <!-- 2. Fleet -->
+        <fieldset class="step" data-step="2" hidden>
+          <legend class="q">How many trucks do you have?</legend>
+          <div class="tiles tiles--2">
+            {fleet.map((f) => <label class="tile"><input type="radio" name="fleet_size" value={f} /><span>{f}</span></label>)}
+          </div>
+          <p class="hint small" id="fleet-hint">Count power units in your current fleet.</p>
+        </fieldset>
+
+        <!-- 3. Pay type -->
+        <fieldset class="step" data-step="3" hidden>
+          <legend class="q">How do you pay your drivers?</legend>
+          <div class="tiles tiles--2">
+            {["Cents per mile", "% of gross", "Both"].map((p) => <label class="tile"><input type="radio" name="pay_type" value={p} /><span>{p}</span></label>)}
+          </div>
+        </fieldset>
+
+        <!-- 4. Pay rate -->
+        <fieldset class="step" data-step="4" hidden>
+          <legend class="q">What do you pay your drivers?</legend>
+          <div class="rate" id="rate-cpm">
+            <p class="sub">Cents per mile (CPM)</p>
+            <div class="tiles tiles--2">
+              {cpm.map((c) => <label class="tile"><input type="radio" name="cpm_rate" value={c} /><span>{c}</span></label>)}
+              <label class="tile"><input type="radio" name="cpm_rate" value="other" /><span>Another rate</span></label>
+            </div>
+            <input class="other" id="cpm-other" placeholder="Your CPM, e.g. 78¢ solo / 90¢ team" hidden />
+          </div>
+          <div class="rate" id="rate-gross">
+            <p class="sub">Percent of gross</p>
+            <div class="tiles tiles--2">
+              {gross.map((g) => <label class="tile"><input type="radio" name="gross_rate" value={g} /><span>{g}</span></label>)}
+              <label class="tile"><input type="radio" name="gross_rate" value="other" /><span>Another rate</span></label>
+            </div>
+            <input class="other" id="gross-other" placeholder="Your percentage" hidden />
+          </div>
+        </fieldset>
+
+        <!-- 5. Trailers -->
+        <fieldset class="step" data-step="5" hidden>
+          <legend class="q">What trailers do you run?</legend>
+          <p class="hint">Select all that apply.</p>
+          <div class="tiles">
+            {trailers.map((t) => <label class="tile tile--check"><input type="checkbox" name="trailers" value={t} /><span>{t}</span></label>)}
+          </div>
+        </fieldset>
+
+        <!-- 6. Escrow -->
+        <fieldset class="step" data-step="6" hidden>
+          <legend class="q">Do you have driver escrow?</legend>
+          <div class="tiles tiles--2">
+            {["Yes", "No"].map((v) => <label class="tile"><input type="radio" name="escrow" value={v} /><span>{v}</span></label>)}
+          </div>
+        </fieldset>
+
+        <!-- 7. Truck year -->
+        <fieldset class="step" data-step="7" hidden>
+          <legend class="q">What year are most of your trucks?</legend>
+          <div class="tiles tiles--2">
+            {years.map((y) => <label class="tile"><input type="radio" name="truck_year" value={y} /><span>{y}</span></label>)}
+          </div>
+        </fieldset>
+
+        <!-- 8. Drivers wanted -->
+        <fieldset class="step" data-step="8" hidden>
+          <legend class="q">Which drivers are you looking for?</legend>
+          <p class="hint">Select all that apply.</p>
+          <div class="tiles tiles--2">
+            {positions.map((p) => <label class="tile tile--check"><input type="checkbox" name="positions" value={p} /><span>{p}</span></label>)}
+          </div>
+          <p class="sub">How many drivers do you need right now?</p>
+          <div class="tiles tiles--5">
+            {needed.map((n) => <label class="tile tile--sm"><input type="radio" name="drivers_needed" value={n} /><span>{n}</span></label>)}
+          </div>
+        </fieldset>
+
+        <!-- 9. Call time + contact -->
+        <fieldset class="step" data-step="9" hidden>
+          <legend class="q">When should we call you?</legend>
+          <div class="form__row">
+            <div class="field"><label for="call-date">Day</label><input id="call-date" name="call_date" type="date" /></div>
+            <div class="field">
+              <label for="tz">Time zone</label>
+              <select id="tz" name="timezone">{zones.map((z) => <option>{z}</option>)}</select>
+            </div>
+          </div>
+          <p class="sub">Time window</p>
+          <div class="tiles tiles--3">
+            {times.map((t) => <label class="tile tile--sm"><input type="radio" name="call_time" value={t} /><span>{t}</span></label>)}
+          </div>
+          <div class="form__row">
+            <div class="field"><label for="c-name">Your name</label><input id="c-name" name="contact_name" autocomplete="name" /></div>
+            <div class="field"><label for="c-phone">Phone</label><input id="c-phone" name="phone" type="tel" autocomplete="tel" /></div>
+          </div>
+          <div class="field"><label for="c-email">Email</label><input id="c-email" name="email" type="email" autocomplete="email" /></div>
+          <div class="field"><label for="c-notes">Anything we should know? (optional)</label><textarea id="c-notes" name="notes" placeholder="Lanes, minimum experience, home time…"></textarea></div>
+          <div class="hp" aria-hidden="true"><label>Company website<input name="company_website" tabindex="-1" autocomplete="off" /></label></div>
+        </fieldset>
+
+        <!-- Done -->
+        <div class="done" id="done" hidden tabindex="-1">
+          <p class="done__mark" aria-hidden="true">✓</p>
+          <h2 class="q">Request received.</h2>
+          <p id="done-msg">We'll confirm the time with you before the call.</p>
+          <a class="btn btn--line" href="/carriers/">Back to CDL driver recruiting</a>
+        </div>
+
+        <p class="form-status" id="wiz-status" role="alert" hidden></p>
+
+        <div class="wiz__nav" id="wiz-nav">
+          <button type="button" class="back" id="back">← Back</button>
+          <button type="button" class="btn btn--blue next" id="next" disabled>Continue →</button>
+        </div>
+      </form>
+      <p class="wiz__foot">Rather email? <a href={`mailto:${SITE.email}`}>{SITE.email}</a></p>
+    </div>
+  </section>
+</Base>
+
+<script define:vars={{ endpoint: SITE.formWebhook, email: SITE.email, TOTAL }}>
+  const form = document.getElementById("wiz");
+  const steps = [...form.querySelectorAll(".step")];
+  const next = document.getElementById("next");
+  const back = document.getElementById("back");
+  const bar = document.getElementById("bar");
+  const stepN = document.getElementById("step-n");
+  const status = document.getElementById("wiz-status");
+  let i = 0;
+  let submissionId = crypto.randomUUID();
+  const company = { company: "", dot_number: "", mc_number: "", fmcsa_location: "", fmcsa_power_units: "", fmcsa_status: "" };
+
+  const val = (name) => form.querySelector(`input[name="${name}"]:checked`)?.value || "";
+  const vals = (name) => [...form.querySelectorAll(`input[name="${name}"]:checked`)].map((x) => x.value);
+  const field = (id) => document.getElementById(id).value.trim();
+
+  // ---- FMCSA step ----
+  const q = document.getElementById("fm-q");
+  const msg = document.getElementById("fm-msg");
+  const results = document.getElementById("fm-results");
+  const manual = document.getElementById("fm-manual");
+  const picked = document.getElementById("fm-picked");
+
+  function setCompany(c) {
+    Object.assign(company, c);
+    if (c.company) {
+      picked.hidden = false;
+      picked.innerHTML = "";
+      const b = document.createElement("strong"); b.textContent = c.company;
+      const s = document.createElement("span"); s.textContent = `USDOT ${c.dot_number}${c.fmcsa_location ? " · " + c.fmcsa_location : ""}`;
+      picked.append("Selected: ", b, s);
+    } else picked.hidden = true;
+    validate();
+  }
+
+  function bucket(n) {
+    if (!n && n !== 0) return "";
+    if (n <= 5) return "1–5 trucks"; if (n <= 10) return "6–10 trucks"; if (n <= 19) return "11–19 trucks";
+    if (n <= 50) return "20–50 trucks"; if (n <= 100) return "51–100 trucks"; if (n <= 200) return "101–200 trucks"; return "200+ trucks";
+  }
+
+  function render(list) {
+    results.innerHTML = "";
+    list.forEach((r, k) => {
+      const label = document.createElement("label"); label.className = "tile tile--result";
+      const input = document.createElement("input"); input.type = "radio"; input.name = "fm_pick"; input.value = String(k);
+      const box = document.createElement("span");
+      const t = document.createElement("strong"); t.textContent = r.legalName + (r.dbaName ? ` (${r.dbaName})` : "");
+      const m = document.createElement("small");
+      const loc = [r.city, r.state].filter(Boolean).join(", ");
+      m.textContent = [`USDOT ${r.dotNumber}`, loc, r.powerUnits != null ? `${r.powerUnits} power units` : "", r.allowedToOperate ? "Active" : "Not active"].filter(Boolean).join(" · ");
+      box.append(t, m); label.append(input, box); results.append(label);
+      input.addEventListener("change", () => {
+        manual.hidden = true;
+        setCompany({ company: r.legalName, dot_number: r.dotNumber, mc_number: "", fmcsa_location: loc,
+          fmcsa_power_units: r.powerUnits != null ? String(r.powerUnits) : "", fmcsa_status: r.allowedToOperate ? "Active" : "Not active" });
+        const b = bucket(r.powerUnits);
+        const tile = b && form.querySelector(`input[name="fleet_size"][value="${b}"]`);
+        if (tile) { tile.checked = true; document.getElementById("fleet-hint").textContent = `FMCSA lists ${r.powerUnits} power units. Change it if that's out of date.`; }
+      });
+    });
+  }
+
+  // Direct lookup in FMCSA's public Company Census data (no key, works on any host).
+  async function censusSearch(term) {
+    const p = new URLSearchParams({ $limit: "10", $select: "dot_number,legal_name,dba_name,phy_city,phy_state,power_units,total_drivers,status_code" });
+    if (/^\d{1,8}$/.test(term)) p.set("dot_number", term); else { p.set("$q", term); p.set("$where", "status_code='A'"); }
+    const res = await fetch(`https://data.transportation.gov/resource/az4n-8mr2.json?${p}`, { signal: AbortSignal.timeout(12000) });
+    if (!res.ok) throw new Error("census");
+    const rows = await res.json();
+    return rows.map((r) => ({ legalName: r.legal_name || "", dbaName: r.dba_name || "", dotNumber: String(r.dot_number || ""),
+      city: r.phy_city || "", state: r.phy_state || "", powerUnits: r.power_units ? Number(r.power_units) : null, allowedToOperate: r.status_code === "A" }))
+      .filter((r) => r.dotNumber);
+  }
+
+  async function search() {
+    const term = q.value.trim();
+    if (term.length < 2) { msg.textContent = "Type at least 2 characters."; return; }
+    msg.textContent = "Searching FMCSA…"; results.innerHTML = "";
+    let list = null, note = "";
+    try {
+      const res = await fetch(`/api/fmcsa?q=${encodeURIComponent(term)}`, { signal: AbortSignal.timeout(12000) });
+      const data = await res.json();
+      if (res.ok && Array.isArray(data.results)) { list = data.results; note = data.note || ""; }
+    } catch (e) { /* API not available on this host: fall back below */ }
+    if (list === null) {
+      const mcOnly = /^(mc|mx|ff)[\s#-]*\d+$/i.test(term);
+      if (mcOnly) { list = []; note = "MC search isn't available here. Search by USDOT number or company name."; }
+      else { try { list = await censusSearch(term); } catch (e) { list = null; } }
+    }
+    if (list === null) {
+      msg.textContent = "FMCSA search isn't available right now. Enter your DOT number manually, or look it up on SAFER.";
+      manual.hidden = false; return;
+    }
+    if (!list.length) { msg.textContent = note || "No match. Try your USDOT number, or enter it manually below."; manual.hidden = false; return; }
+    msg.textContent = `${list.length} match${list.length > 1 ? "es" : ""}. Pick your company.`;
+    render(list);
+  }
+  document.getElementById("fm-go").addEventListener("click", search);
+  q.addEventListener("keydown", (e) => { if (e.key === "Enter") { e.preventDefault(); search(); } });
+  ["m-company", "m-dot", "m-mc"].forEach((id) => document.getElementById(id).addEventListener("input", () => {
+    form.querySelectorAll('input[name="fm_pick"]').forEach((x) => (x.checked = false));
+    const dot = field("m-dot").replace(/\D/g, "");
+    setCompany({ company: field("m-company"), dot_number: dot, mc_number: field("m-mc"), fmcsa_location: "", fmcsa_power_units: "", fmcsa_status: "Entered manually" });
+  }));
+
+  // ---- Pay step: show the right rate groups ----
+  function syncRates() {
+    const t = val("pay_type");
+    document.getElementById("rate-cpm").hidden = !(t === "Cents per mile" || t === "Both");
+    document.getElementById("rate-gross").hidden = !(t === "% of gross" || t === "Both");
+    document.getElementById("cpm-other").hidden = val("cpm_rate") !== "other";
+    document.getElementById("gross-other").hidden = val("gross_rate") !== "other";
+  }
+
+  // ---- Validation per step ----
+  const today = new Date(); const pad = (n) => String(n).padStart(2, "0");
+  const dateInput = document.getElementById("call-date");
+  dateInput.min = `${today.getFullYear()}-${pad(today.getMonth() + 1)}-${pad(today.getDate())}`;
+  const tzGuess = { "America/New_York": "Eastern", "America/Detroit": "Eastern", "America/Denver": "Mountain", "America/Phoenix": "Mountain", "America/Los_Angeles": "Pacific" }[Intl.DateTimeFormat().resolvedOptions().timeZone];
+  if (tzGuess) document.getElementById("tz").value = tzGuess;
+
+  function rateOk() {
+    const t = val("pay_type");
+    const c = val("cpm_rate"), g = val("gross_rate");
+    const cOk = c && (c !== "other" || field("cpm-other"));
+    const gOk = g && (g !== "other" || field("gross-other"));
+    return t === "Both" ? cOk && gOk : t === "% of gross" ? gOk : cOk;
+  }
+  const checks = {
+    1: () => company.company.length > 1 && /^\d{1,8}$/.test(company.dot_number),
+    2: () => !!val("fleet_size"),
+    3: () => !!val("pay_type"),
+    4: rateOk,
+    5: () => vals("trailers").length > 0,
+    6: () => !!val("escrow"),
+    7: () => !!val("truck_year"),
+    8: () => vals("positions").length > 0 && !!val("drivers_needed"),
+    9: () => !!dateInput.value && !!val("call_time") && field("c-name").length > 1 &&
+      field("c-phone").replace(/\D/g, "").length >= 10 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(field("c-email")),
+  };
+  function validate() { next.disabled = !checks[i + 1](); }
+
+  function show(n) {
+    steps.forEach((s, k) => (s.hidden = k !== n));
+    i = n;
+    stepN.textContent = String(n + 1);
+    bar.style.width = `${((n + 1) / TOTAL) * 100}%`;
+    back.style.visibility = n === 0 ? "hidden" : "visible";
+    next.textContent = n === TOTAL - 1 ? "Request my call" : "Continue →";
+    status.hidden = true;
+    if (n === 3) syncRates();
+    validate();
+    steps[n].querySelector(".q")?.focus?.();
+  }
+
+  form.addEventListener("change", () => { syncRates(); validate(); });
+  form.addEventListener("input", validate);
+  back.addEventListener("click", () => i > 0 && show(i - 1));
+  form.addEventListener("submit", (e) => e.preventDefault());
+
+  // Auto-advance on single-choice steps (keeps it quick, like a survey)
+  form.querySelectorAll('.step[data-step="2"] input, .step[data-step="3"] input, .step[data-step="6"] input, .step[data-step="7"] input')
+    .forEach((x) => x.addEventListener("click", () => setTimeout(() => { if (checks[i + 1]()) show(i + 1); }, 180)));
+
+  next.addEventListener("click", async () => {
+    if (!checks[i + 1]()) return;
+    if (i < TOTAL - 1) { show(i + 1); return; }
+    if (form.querySelector('input[name="company_website"]').value) return;
+
+    const t = val("pay_type");
+    const payload = {
+      form: "call_request",
+      submission_id: submissionId,
+      ...company,
+      fleet_size: val("fleet_size"),
+      pay_type: t,
+      cpm_rate: t === "% of gross" ? "" : (val("cpm_rate") === "other" ? field("cpm-other") : val("cpm_rate")),
+      gross_rate: t === "Cents per mile" ? "" : (val("gross_rate") === "other" ? field("gross-other") : val("gross_rate")),
+      trailers: vals("trailers").join(", "),
+      escrow: val("escrow"),
+      truck_year: val("truck_year"),
+      positions: vals("positions").join(", "),
+      drivers_needed: val("drivers_needed"),
+      call_date: dateInput.value,
+      call_time: val("call_time"),
+      timezone: document.getElementById("tz").value,
+      contact_name: field("c-name"),
+      phone: field("c-phone"),
+      email: field("c-email"),
+      notes: field("c-notes"),
+    };
+
+    next.disabled = true; const label = next.textContent; next.textContent = "Sending…";
+    try {
+      const res = await fetch(endpoint, { method: "POST", headers: { "Content-Type": "application/json", Accept: "application/json" }, body: JSON.stringify(payload), signal: AbortSignal.timeout(20000) });
+      const result = await res.json().catch(() => ({}));
+      if (!res.ok || result.ok !== true) throw new Error(result.error || `We could not confirm your request. Please retry or email ${email}.`);
+      steps.forEach((s) => (s.hidden = true));
+      document.getElementById("wiz-nav").hidden = true;
+      bar.style.width = "100%";
+      const done = document.getElementById("done"); done.hidden = false;
+      document.getElementById("done-msg").textContent = result.message || "We'll confirm the time with you before the call.";
+      done.focus();
+      if (window.gtag) window.gtag("event", "call_request");
+      if (window.fbq) window.fbq("track", "Schedule");
+    } catch (e) {
+      status.hidden = false; status.className = "form-status form-status--err";
+      status.textContent = e instanceof Error ? e.message : `We could not confirm your request. Please retry or email ${email}.`;
+      next.disabled = false; next.textContent = label;
+    }
+  });
+
+  show(0);
+</script>
+
+<style is:global>
+  .book-band { background: var(--navy); color: #fff; padding: clamp(40px, 6vw, 72px) 0 clamp(96px, 10vw, 130px); }
+  .book-band h1 { font-size: clamp(2rem, 4.2vw, 3.25rem); margin-top: 14px; max-width: 18ch; }
+  .book-band p:not(.eyebrow) { color: rgb(255 255 255 / 0.78); max-width: 38rem; margin: 16px 0 0; }
+  .eyebrow { display: flex; align-items: center; gap: 12px; margin: 0; color: var(--sky); font: 600 0.75rem/1 var(--font-mono); letter-spacing: 0.2em; text-transform: uppercase; }
+  .dash { width: 28px; height: 3px; background: repeating-linear-gradient(90deg, var(--sky) 0 8px, transparent 8px 12px); }
+
+  .book-area { background: var(--paper-2); padding-bottom: clamp(48px, 7vw, 96px); }
+  .wiz {
+    position: relative; margin: clamp(-80px, -7vw, -64px) auto 0; max-width: 680px;
+    background: #fff; border: 1px solid var(--line); border-radius: 10px;
+    padding: clamp(22px, 4vw, 40px); box-shadow: 0 24px 48px -32px rgb(13 10 68 / 0.45);
+  }
+  .wiz__top { display: flex; justify-content: space-between; align-items: center; }
+  .wiz__label { margin: 0; font: 600 0.75rem/1 var(--font-mono); letter-spacing: 0.16em; text-transform: uppercase; color: var(--blue); }
+  .wiz__count { margin: 0; color: var(--ink-3); font-size: 0.875rem; font-variant-numeric: tabular-nums; }
+  .wiz__bar { height: 4px; background: var(--paper-2); border-radius: 4px; margin: 14px 0 28px; overflow: hidden; }
+  .wiz__bar span { display: block; height: 100%; width: 11%; background: linear-gradient(90deg, var(--royal), var(--sky)); transition: width 260ms ease; }
+
+  .step { border: 0; margin: 0; padding: 0; min-width: 0; }
+  .q { font: 600 clamp(1.5rem, 3vw, 1.875rem)/1.15 var(--font-display); letter-spacing: -0.02em; margin: 0 0 8px; padding: 0; color: var(--ink); }
+  .q:focus { outline: none; }
+  .hint { color: var(--ink-3); margin: 0 0 18px; font-size: 0.9375rem; }
+  .hint.small { font-size: 0.875rem; margin: 16px 0 0; }
+  .sub { font-weight: 600; margin: 22px 0 10px; font-size: 0.9375rem; }
+  .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+
+  .tiles { display: grid; gap: 10px; }
+  .tiles--2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .tiles--3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .tiles--5 { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+  .tile { position: relative; display: block; cursor: pointer; }
+  .tile input { position: absolute; opacity: 0; inset: 0; cursor: pointer; }
+  .tile > span {
+    display: flex; align-items: center; gap: 12px; min-height: 56px; padding: 12px 16px;
+    border: 1.5px solid var(--line); border-radius: 8px; background: #fff;
+    font-weight: 600; font-size: 0.9375rem; color: var(--ink);
+    transition: border-color 140ms ease, background-color 140ms ease, box-shadow 140ms ease;
+  }
+  .tile--sm > span { min-height: 48px; justify-content: center; padding: 10px 8px; font-size: 0.875rem; }
+  .tile:hover > span { border-color: var(--blue); }
+  .tile input:checked + span { border-color: var(--royal); background: #eef3ff; box-shadow: inset 0 0 0 1px var(--royal); }
+  .tile input:focus-visible + span { outline: 3px solid var(--sky); outline-offset: 2px; }
+  .tile--check > span::before {
+    content: ""; flex: none; width: 20px; height: 20px; border-radius: 4px; border: 1.5px solid var(--ink-3); background: #fff;
+  }
+  .tile--check input:checked + span::before {
+    border-color: var(--royal); background: var(--royal) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M5 10.5l3.2 3L15 6.5' fill='none' stroke='white' stroke-width='2.4'/%3E%3C/svg%3E") center/16px no-repeat;
+  }
+  .tile--result > span { flex-direction: column; align-items: flex-start; gap: 4px; }
+  .tile--result small { font-weight: 500; color: var(--ink-3); font-size: 0.8125rem; }
+
+  .search { display: flex; gap: 10px; }
+  .search input { flex: 1; min-height: 52px; padding: 12px 14px; font: inherit; border: 1.5px solid var(--line); border-radius: var(--radius); }
+  .search input:focus { outline: none; border-color: var(--blue); box-shadow: 0 0 0 3px rgb(25 106 249 / 0.18); }
+  .fm-msg { min-height: 1.4em; margin: 10px 0; font-size: 0.875rem; color: var(--ink-2); }
+  .results { display: grid; gap: 8px; }
+  .linkbtn { background: none; border: 0; padding: 0; font: inherit; color: var(--blue); text-decoration: underline; cursor: pointer; }
+  .manual { margin-top: 18px; display: grid; gap: 14px; }
+  .manual[hidden], .picked[hidden], .done[hidden], .wiz__nav[hidden] { display: none; }
+  .picked { margin-top: 18px; padding: 14px 16px; border-radius: 8px; background: #eef3ff; color: var(--ink-2); display: flex; flex-wrap: wrap; gap: 4px 10px; font-size: 0.9375rem; }
+  .picked strong { color: var(--ink); }
+  .other { margin-top: 10px; width: 100%; min-height: 50px; padding: 12px 14px; font: inherit; border: 1.5px solid var(--line); border-radius: var(--radius); }
+  .other[hidden] { display: none; }
+  .rate[hidden] { display: none; }
+  .step textarea { min-height: 90px; }
+  .step .field { margin-top: 14px; }
+  .step .form__row .field { margin-top: 0; }
+  .step .form__row { margin-top: 14px; }
+
+  .wiz__nav { display: flex; justify-content: space-between; align-items: center; margin-top: 30px; padding-top: 22px; border-top: 1px solid var(--line); }
+  .back { background: none; border: 0; font: 600 0.9375rem var(--font-body); color: var(--ink-2); cursor: pointer; padding: 10px 0; }
+  .back:hover { color: var(--blue); }
+  .next { min-width: 170px; }
+  .next[disabled] { opacity: 0.4; cursor: not-allowed; }
+  .wiz .form-status { margin-top: 18px; }
+
+  .done { text-align: center; padding: 20px 0 6px; }
+  .done:focus { outline: none; }
+  .done__mark { width: 56px; height: 56px; margin: 0 auto 16px; display: grid; place-items: center; border-radius: 50%; background: #eef3ff; color: var(--royal); font-size: 1.5rem; font-weight: 700; }
+  .done p { color: var(--ink-2); }
+  .wiz__foot { text-align: center; margin: 22px 0 0; color: var(--ink-3); font-size: 0.875rem; }
+
+  @media (max-width: 560px) {
+    .tiles--2, .tiles--3 { grid-template-columns: 1fr; }
+    .tiles--5 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .search { flex-direction: column; }
+    .next { min-width: 0; }
+  }
+</style>
