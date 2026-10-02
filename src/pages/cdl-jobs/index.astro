@@ -1,0 +1,115 @@
+---
+import Base from "../../layouts/Base.astro";
+import JobCard from "../../components/JobCard.astro";
+import { activeJobs } from "../../data/jobs";
+
+const list = activeJobs();
+const positions = [...new Set(list.flatMap((j) => j.positions))];
+const divisions = [...new Set(list.flatMap((j) => j.divisions))];
+---
+<Base
+  title="CDL-A Jobs: Company Driver, 1099, Lease to Rent & Lease Purchase | Nexus"
+  description="Open CDL-A truck driving jobs with pay, home time and equipment shown up front. Dry van, reefer and open deck. Company driver, 1099 and lease positions."
+>
+  <section class="band">
+    <div class="wrap">
+      <p class="mono-label">CDL-A jobs · {list.length} open</p>
+      <h1 class="display">Know the pay before you pick up the phone.</h1>
+      <p>Every job below shows what it pays, how long you're out and what you drive. Filter, open the one that fits, apply in two minutes.</p>
+    </div>
+  </section>
+
+  <section class="section section--alt">
+    <div class="wrap">
+      <form class="filters" aria-label="Filter jobs" onsubmit="return false">
+        <fieldset>
+          <legend class="mono-label">Position</legend>
+          <div class="chips">
+            <label><input type="radio" name="position" value="" checked /> <span>All</span></label>
+            {positions.map((p) => <label><input type="radio" name="position" value={p} /> <span>{p}</span></label>)}
+          </div>
+        </fieldset>
+        <fieldset>
+          <legend class="mono-label">Trailer</legend>
+          <div class="chips">
+            <label><input type="radio" name="division" value="" checked /> <span>All</span></label>
+            {divisions.map((d) => <label><input type="radio" name="division" value={d} /> <span>{d}</span></label>)}
+          </div>
+        </fieldset>
+      </form>
+
+      <p class="count" aria-live="polite"><span id="job-count">{list.length}</span> jobs</p>
+
+      <div class="grid" id="job-grid">
+        {list.map((job) => <JobCard job={job} />)}
+      </div>
+      <p class="empty" id="job-empty" hidden>
+        No job matches both filters right now. <a href="/apply/">Apply anyway</a> and a recruiter will match you when one opens.
+      </p>
+    </div>
+  </section>
+</Base>
+
+<script>
+  const form = document.querySelector<HTMLFormElement>(".filters")!;
+  const cards = [...document.querySelectorAll<HTMLElement>("#job-grid .jc")];
+  const count = document.getElementById("job-count")!;
+  const empty = document.getElementById("job-empty")!;
+
+  function apply() {
+    const fd = new FormData(form);
+    const pos = String(fd.get("position") || "");
+    const div = String(fd.get("division") || "");
+    let shown = 0;
+    for (const c of cards) {
+      const ok =
+        (!pos || (c.dataset.positions || "").split("|").includes(pos)) &&
+        (!div || (c.dataset.divisions || "").split("|").includes(div));
+      c.hidden = !ok;
+      if (ok) shown++;
+    }
+    count.textContent = String(shown);
+    empty.hidden = shown !== 0;
+    const params = new URLSearchParams();
+    if (pos) params.set("position", pos);
+    if (div) params.set("trailer", div);
+    history.replaceState(null, "", params.toString() ? `?${params}` : location.pathname);
+  }
+
+  // Restore filters from URL (?position=Lease%20to%20Rent&trailer=Reefer)
+  const url = new URLSearchParams(location.search);
+  const setRadio = (name: string, value: string | null) => {
+    if (!value) return;
+    const el = form.querySelector<HTMLInputElement>(`input[name="${name}"][value="${CSS.escape(value)}"]`);
+    if (el) el.checked = true;
+  };
+  setRadio("position", url.get("position"));
+  setRadio("division", url.get("trailer"));
+
+  form.addEventListener("change", apply);
+  apply();
+</script>
+
+<style>
+  .filters { display: flex; flex-wrap: wrap; gap: 20px 40px; margin-bottom: 24px; }
+  fieldset { border: 0; margin: 0; padding: 0; }
+  legend { margin-bottom: 10px; padding: 0; }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .chips label { position: relative; }
+  .chips input { position: absolute; opacity: 0; inset: 0; cursor: pointer; }
+  .chips span {
+    display: inline-flex; align-items: center; min-height: 40px; padding: 0 14px;
+    border: 1.5px solid var(--line); border-radius: 999px; background: #fff;
+    font-weight: 500; font-size: 0.9375rem; color: var(--ink-2);
+    transition: background-color 140ms ease, color 140ms ease, border-color 140ms ease;
+  }
+  .chips label:hover span { border-color: var(--navy); }
+  .chips input:checked + span { background: var(--navy); border-color: var(--navy); color: #fff; }
+  .chips input:focus-visible + span { outline: 3px solid var(--sky); outline-offset: 2px; }
+  .count { margin: 0 0 16px; color: var(--ink-3); font-size: 0.9375rem; }
+  .grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; }
+  .grid :global(.jc[hidden]) { display: none; }
+  .empty { padding: 28px; background: #fff; border: 1px dashed var(--line); border-radius: var(--radius); }
+  @media (max-width: 960px) { .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (max-width: 640px) { .grid { grid-template-columns: 1fr; } }
+</style>

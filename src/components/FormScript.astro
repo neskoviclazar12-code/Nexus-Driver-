@@ -1,0 +1,28 @@
+---
+import { SITE } from "../config";
+---
+<script define:vars={{ endpoint: SITE.formWebhook, email: SITE.email }}>
+ document.querySelectorAll('form[data-nexus-form]').forEach(form=>{
+  const status=form.querySelector('.form-status');
+  const button=form.querySelector('button[type="submit"]');
+  let submissionId=crypto.randomUUID();
+  const show=(ok,msg)=>{status.hidden=false;status.className='form-status '+(ok?'form-status--ok':'form-status--err');status.textContent=msg;status.focus();};
+  form.addEventListener('submit',async e=>{
+   e.preventDefault();if(button.disabled)return;
+   if(!form.checkValidity()){form.reportValidity();return;}
+   const data=Object.fromEntries(new FormData(form).entries());
+   if(data.company_website)return;
+   data.form=form.dataset.nexusForm;data.submission_id=submissionId;
+   if(data.form==='driver_application')data.sms_consent=data.sms_consent||'no';
+   button.disabled=true;const label=button.textContent;button.textContent='Sending…';
+   try{
+    const res=await fetch(endpoint,{method:'POST',headers:{'Content-Type':'application/json',Accept:'application/json'},body:JSON.stringify(data),signal:AbortSignal.timeout(20000)});
+    const result=await res.json();
+    if(!res.ok || result.ok!==true)throw new Error(result.error||'We could not confirm your submission. Please retry or email '+email+'.');
+    form.reset();submissionId=crypto.randomUUID();show(true,result.message);
+    const ev=form.dataset.event;if(ev&&window.gtag)window.gtag('event',ev);if(ev&&window.fbq)window.fbq('track',ev==='carrier_inquiry'?'Contact':'Lead');
+   }catch(err){show(false,err instanceof Error && err.name==='Error'?err.message:'We could not confirm your submission. Please retry or email '+email+'.');}
+   finally{button.disabled=false;button.textContent=label;}
+  });
+ });
+</script>

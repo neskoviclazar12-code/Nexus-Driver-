@@ -1,0 +1,24 @@
+---
+import Base from "../layouts/Base.astro";
+import { SITE } from "../config";
+---
+<Base title="SMS Terms | Nexus Driver Solutions" description="Terms for calls and text messages from Nexus Driver Solutions.">
+  <section class="band"><div class="wrap"><p class="mono-label">Legal</p><h1 class="display">SMS Terms</h1><p>TODO: have this reviewed by your attorney and your SMS provider before launch.</p></div></section>
+  <section class="section"><div class="wrap legal">
+    <h2>Program</h2>
+    <p>By submitting a form on this site and checking the consent box, you agree that {SITE.legalName} may call and text you at the number you provided about CDL driving jobs, your application and recruiting updates. Messages may be sent using automated technology.</p>
+    <h2>Consent is optional</h2>
+    <p>Consent to receive calls and texts is not a condition of applying for or getting any job.</p>
+    <h2>Frequency and cost</h2>
+    <p>Message frequency varies. Message and data rates may apply.</p>
+    <h2>Opting out and help</h2>
+    <p>Reply STOP to any message to stop receiving texts. Reply HELP for help. You can also contact us through the forms on this site.</p>
+    <h2>Privacy</h2>
+    <p>Mobile numbers and SMS consent are not sold or shared with third parties for their marketing. See our <a href="/privacy-policy/">Privacy Policy</a>.</p>
+  </div></section>
+</Base>
+<style>
+  .legal { max-width: 46rem; }
+  .legal h2 { font: 700 1.5rem/1.2 var(--font-display); margin: 32px 0 8px; }
+  .legal p { color: var(--ink-2); margin: 0; }
+</style>

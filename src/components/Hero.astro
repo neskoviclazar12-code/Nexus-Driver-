@@ -1,0 +1,44 @@
+---
+---
+<section class="hero" aria-labelledby="hero-title">
+ <div class="hero__media" aria-hidden="true"><video autoplay muted loop playsinline preload="metadata" poster="/video/nexus-hero-poster.webp"><source src="/video/nexus-hero.webm" type="video/webm"/><source src="/video/nexus-hero.mp4" type="video/mp4"/></video></div>
+ <div class="wrap hero__inner">
+  <p class="hero__eyebrow"><span class="hero__dash" aria-hidden="true"></span>CDL-A Driver Recruiting Agency</p>
+  <h1 id="hero-title">You pay when<br/>the wheels <span>turn.</span></h1>
+  <p class="hero__lede">Your lanes. Your hiring standards. We find the drivers.<br class="desktop-break"/> No retainer. No ad budget. You pay when a driver starts.</p>
+  <div class="hero__actions"><a class="btn btn--blue" href="/carriers/#inquiry">Hire Drivers <span aria-hidden="true">↗</span></a><a class="hero__driver" href="/cdl-jobs/">Looking for a driving job? <span>Explore jobs →</span></a></div>
+  <div class="hero__bottom"><strong class="hero__trust">Trusted by 30+ carriers</strong><span>Company drivers</span><span>Teams</span><span>Lease opportunities</span><button type="button" class="video-toggle" aria-pressed="false">Pause video</button></div>
+ </div>
+</section>
+<script>
+const video=document.querySelector<HTMLVideoElement>('.hero video');
+const button=document.querySelector<HTMLButtonElement>('.video-toggle');
+const reduced=matchMedia('(prefers-reduced-motion: reduce)');
+function sync(){if(button&&video){button.textContent=video.paused?'Play video':'Pause video';button.setAttribute('aria-pressed',String(video.paused));}}
+function preference(){if(reduced.matches){video?.pause();video?.removeAttribute('autoplay');}else{video?.play().catch(()=>{});}sync();}
+video?.addEventListener('pause',sync);video?.addEventListener('play',sync);
+button?.addEventListener('click',()=>{if(video?.paused)video.play().catch(()=>{});else video?.pause();});
+reduced.addEventListener('change',preference);preference();
+</script>
+<style>
+.hero{position:relative;isolation:isolate;overflow:hidden;background:var(--navy);color:#fff;}
+.hero__media{position:absolute;inset:0;z-index:-1;}
+.hero__media video{width:100%;height:100%;object-fit:cover;object-position:70% 50%;}
+.hero__media::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(13,10,68,.96) 0%,rgba(13,10,68,.8) 44%,rgba(13,10,68,.3) 100%),linear-gradient(0deg,rgba(13,10,68,.85),transparent 50%);}
+.hero__inner{padding-top:90px;padding-bottom:28px;}
+.hero__eyebrow{display:flex;align-items:center;gap:14px;margin:0 0 26px;color:var(--sky);font:600 .8125rem/1 var(--font-mono);letter-spacing:.22em;text-transform:uppercase;}
+.hero__dash{width:30px;height:3px;flex:none;background:repeating-linear-gradient(90deg,var(--sky) 0 8px,transparent 8px 12px);}
+.hero__trust{color:#fff;font-weight:600;font-size:.8125rem;display:inline-flex;align-items:center;gap:10px;}
+.hero__trust::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--sky);box-shadow:0 0 0 4px rgb(95 160 255 / .2);}
+h1{font:600 clamp(2.75rem,5.4vw,4.75rem)/1.06 var(--font-display);letter-spacing:-.03em;max-width:900px;margin:0;}
+h1 span{color:var(--sky);}
+.hero__lede{font-size:1.06rem;line-height:1.8;color:#d9e0f3;max-width:640px;margin:28px 0 0;}
+.hero__actions{display:flex;align-items:center;gap:30px;margin-top:32px;}
+.btn--blue{background:var(--blue);padding:0 30px;min-height:58px;}
+.hero__driver{font-size:.8rem;color:#d9e0f3;text-decoration:none;display:grid;gap:4px;}
+.hero__driver span{color:#fff;font-weight:600;font-size:.93rem;}
+.hero__driver:hover span{text-decoration:underline;}
+.hero__bottom{display:flex;align-items:center;gap:30px;border-top:1px solid #ffffff30;margin-top:70px;padding-top:22px;color:#c7cdea;font-size:.72rem;}
+.video-toggle{margin-left:auto;border:1px solid #ffffff40;border-radius:30px;padding:8px 14px;color:#fff;background:transparent;font:inherit;cursor:pointer;}
+@media(max-width:760px){.hero__inner{padding-top:52px;padding-bottom:22px;}h1{font-size:clamp(2.6rem,9vw,4rem);}.hero__lede{font-size:.94rem;}.hero__actions{align-items:flex-start;gap:24px;flex-direction:column;}.hero__bottom{margin-top:38px;gap:12px;flex-wrap:wrap;font-size:.65rem;}.video-toggle{margin-left:0;}.desktop-break{display:none;}.hero__media::after{background:linear-gradient(90deg,rgba(13,10,68,.94),rgba(13,10,68,.65));}.hero__eyebrow{font-size:.6875rem;letter-spacing:.16em;}}
+</style>

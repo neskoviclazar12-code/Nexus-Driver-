@@ -1,0 +1,51 @@
+---
+import type { Job } from "../data/jobs";
+interface Props { job: Job }
+const { job } = Astro.props;
+---
+<article
+  class="jc"
+  data-positions={job.positions.join("|")}
+  data-divisions={job.divisions.join("|")}
+>
+  <p class="jc__tags mono-label">{job.divisions.join(" · ")} · {job.positions[0]}</p>
+  <h3 class="jc__title"><a href={`/cdl-jobs/${job.slug}/`}>{job.headline}</a></h3>
+  <p class="jc__sub">{job.title.split(":")[0]}</p>
+  <dl class="jc__facts">
+    {job.avgWeekly && (<div><dt>Avg weekly</dt><dd>{job.avgWeekly}</dd></div>)}
+    <div><dt>Home time</dt><dd>{job.homeTime}</dd></div>
+    <div><dt>Truck</dt><dd>{job.truck}</dd></div>
+    <div><dt>Route</dt><dd>{job.route}</dd></div>
+  </dl>
+  <span class="jc__more" aria-hidden="true">View job →</span>
+</article>
+
+<style>
+  .jc {
+    position: relative;
+    display: flex; flex-direction: column; gap: 6px;
+    padding: 22px 22px 20px 26px;
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    transition: border-color 160ms ease, transform 160ms ease, box-shadow 160ms ease;
+  }
+  .jc::before {
+    content: ""; position: absolute; left: 0; top: 18px; bottom: 18px; width: 3px;
+    background: linear-gradient(180deg, var(--royal), var(--sky)); border-radius: 0 2px 2px 0;
+  }
+  .jc:hover { border-color: var(--blue); transform: translateY(-2px); box-shadow: 0 10px 24px -16px rgb(13 10 68 / 0.45); }
+  .jc:focus-within { border-color: var(--blue); }
+  .jc__tags { margin: 0; }
+  .jc__title { margin: 4px 0 0; font: 700 2rem/1.05 var(--font-display); }
+  .jc__title a { color: var(--navy); text-decoration: none; }
+  .jc__title a::after { content: ""; position: absolute; inset: 0; } /* whole card clickable */
+  .jc__title a:focus-visible { outline: none; }
+  .jc__sub { margin: 0; color: var(--ink-2); font-weight: 500; }
+  .jc__facts { margin: 12px 0 0; display: grid; gap: 6px; font-size: 0.9375rem; }
+  .jc__facts div { display: grid; grid-template-columns: 96px 1fr; gap: 8px; }
+  .jc__facts dt { color: var(--ink-3); }
+  .jc__facts dd { margin: 0; color: var(--ink); }
+  .jc__more { margin-top: auto; padding-top: 14px; font-weight: 600; color: var(--royal); font-size: 0.9375rem; }
+  .jc:hover .jc__more { color: var(--blue); }
+</style>

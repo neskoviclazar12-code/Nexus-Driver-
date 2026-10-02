@@ -1,0 +1,26 @@
+---
+import Base from "../layouts/Base.astro";
+import { SITE } from "../config";
+---
+<Base title="Privacy Policy | Nexus Driver Solutions" description="How Nexus Driver Solutions collects and uses information submitted on this website.">
+  <section class="band"><div class="wrap"><p class="mono-label">Legal</p><h1 class="display">Privacy Policy</h1><p>TODO: have this reviewed by your attorney before launch.</p></div></section>
+  <section class="section"><div class="wrap legal">
+    <h2>Who we are</h2>
+    <p>{SITE.legalName}, {SITE.address.street}, {SITE.address.city}, {SITE.address.region} {SITE.address.zip}, USA.</p>
+    <h2>What we collect</h2>
+    <p>Information you submit in our forms: name, phone, email, location, driving experience and job preferences (drivers), or company and contact details (carriers). We also collect basic analytics data such as pages visited and device type.</p>
+    <h2>How we use it</h2>
+    <p>To contact you about driving jobs or recruiting services, to match drivers with carriers, and to improve this website. When you apply for a specific job, we share your application details with that carrier so they can review it.</p>
+    <h2>Calls and texts</h2>
+    <p>If you consent, we may call and text you. See our <a href="/sms-terms/">SMS Terms</a>. Mobile numbers and SMS consent are not sold or shared with third parties for their marketing.</p>
+    <h2>Cookies and analytics</h2>
+    <p>We may use Google Analytics and the Meta Pixel to understand site traffic and measure our ads.</p>
+    <h2>Your choices</h2>
+    <p>You can ask us to update or delete your information by contacting us through this website.</p>
+  </div></section>
+</Base>
+<style>
+  .legal { max-width: 46rem; }
+  .legal h2 { font: 700 1.5rem/1.2 var(--font-display); margin: 32px 0 8px; }
+  .legal p { color: var(--ink-2); margin: 0; }
+</style>

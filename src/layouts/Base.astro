@@ -1,0 +1,161 @@
+---
+import "../styles/global.css";
+import { SITE } from "../config";
+
+interface Props {
+  title: string;
+  description: string;
+  schema?: object | object[];
+  noindex?: boolean;
+}
+const { title, description, schema, noindex = false } = Astro.props;
+const canonical = new URL(Astro.url.pathname, SITE.url).toString();
+const path = Astro.url.pathname;
+const orgSchema = {
+  "@context": "https://schema.org",
+  "@type": "EmploymentAgency",
+  name: SITE.name,
+  legalName: SITE.legalName,
+  url: SITE.url,
+  sameAs: [SITE.instagram, SITE.facebook].filter(Boolean),
+  address: {
+    "@type": "PostalAddress",
+    streetAddress: SITE.address.street,
+    addressLocality: SITE.address.city,
+    addressRegion: SITE.address.region,
+    postalCode: SITE.address.zip,
+    addressCountry: SITE.address.country,
+  },
+};
+const schemas = [orgSchema, ...(schema ? (Array.isArray(schema) ? schema : [schema]) : [])];
+const nav = [
+  { href: "/cdl-jobs/", label: "CDL Jobs" },
+  { href: "/carriers/", label: "For Carriers" },
+];
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    {noindex && <meta name="robots" content="noindex" />}
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={SITE.name} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={new URL("/video/nexus-hero-poster.jpg", SITE.url).toString()} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="theme-color" content="#0d0a44" />
+    <link rel="icon" href="/favicon.ico" sizes="48x48" />
+    <link rel="icon" href="/favicon-32.png" type="image/png" sizes="32x32" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="preload" href="/fonts/Urbane-DemiBold.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+    {schemas.map((s) => <script type="application/ld+json" set:html={JSON.stringify(s)} />)}
+  </head>
+  <body>
+    <a class="skip" href="#main">Skip to content</a>
+    <header class="site-header">
+      <div class="wrap site-header__in">
+        <a class="logo" href="/" aria-label="Nexus Driver Solutions, home"><img src="/brand/nexus-wordmark.png" alt="Nexus Driver Solutions" width="160" height="34" /></a>
+        <button class="menu-toggle" aria-expanded="false" aria-controls="main-nav" type="button">Menu <span aria-hidden="true">☰</span></button>
+        <nav id="main-nav" aria-label="Main">
+          <ul class="nav">
+            <li><a href="/carriers/">For Carriers</a></li>
+            <li><a href="/cdl-jobs/">Find a Job</a></li>
+            <li><a href="/#about">About Nexus</a></li>
+            <li><a class="nav__cta" href="/carriers/#inquiry">Hire Drivers <span aria-hidden="true">↗</span></a></li>
+          </ul>
+        </nav>
+      </div>
+    </header>
+    <main id="main"><slot /></main>
+
+    <footer class="site-footer">
+      <div class="wrap site-footer__in">
+        <div>
+          <img class="footer-logo" src="/brand/nexus-wordmark-light.png" alt="Nexus Driver Solutions" width="160" height="34" loading="lazy" />
+          <p><a class="footer-email" href={`mailto:${SITE.email}`}>{SITE.email}</a></p>
+          <p class="site-footer__small">CDL-A driver recruiting for drivers and carriers.<br />{SITE.legalName} · {SITE.address.street}, {SITE.address.city}, {SITE.address.region} {SITE.address.zip}</p>
+        </div>
+        <ul class="site-footer__links">
+          <li><a href="/cdl-jobs/">CDL-A Jobs</a></li>
+          <li><a href="/apply/">Apply</a></li>
+          <li><a href="/carriers/">Hire Drivers</a></li>
+          <li><a href={SITE.instagram} rel="noopener" target="_blank">Instagram</a></li>
+          <li><a href="/privacy-policy/">Privacy Policy</a></li>
+          <li><a href="/sms-terms/">SMS Terms</a></li>
+        </ul>
+      </div>
+      <div class="wrap site-footer__fine">© {new Date().getFullYear()} {SITE.legalName}. Pay, routes, equipment and policies are subject to confirmation with the carrier and recruiter.</div>
+    </footer>
+  </body>
+</html>
+
+<style is:global>
+  .skip { position: absolute; left: -9999px; top: 8px; background: #fff; color: var(--navy); padding: 10px 14px; z-index: 100; border-radius: 6px; }
+  .skip:focus { left: 8px; }
+
+  .site-header { position: sticky; top: 0; z-index: 50; background: #fff; border-bottom: 1px solid var(--line); }
+  .site-header__in { display: flex; align-items: center; justify-content: space-between; min-height: 88px; gap: 16px; }
+  .logo { display: inline-flex; align-items: center; gap: 10px; color: #fff; text-decoration: none; }
+  .logo__mark { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 6px; background: linear-gradient(90deg, var(--royal), var(--sky)); font: 700 1.25rem/1 var(--font-display); }
+  .logo__text { font: 700 1.375rem/1 var(--font-display); letter-spacing: 0.12em; display: grid; }
+  .logo__text small { font: 500 0.625rem/1.4 var(--font-mono); letter-spacing: 0.14em; color: var(--sky); text-transform: uppercase; }
+  .nav { list-style: none; margin: 0; padding: 0; display: flex; align-items: center; gap: clamp(12px, 2.5vw, 28px); }
+  .nav a { color: var(--ink); text-decoration: none; font-weight: 500; font-size: 0.9375rem; padding: 8px 0; }
+  .nav a:hover, .nav a[aria-current="page"] { color: var(--blue); box-shadow: inset 0 -2px 0 var(--sky); }
+  .nav .nav__cta { background: var(--blue); color: #fff; padding: 10px 16px; border-radius: 6px; box-shadow: none; }
+  .nav .nav__cta:hover { background: var(--sky); color: var(--navy); box-shadow: none; }
+  @media (max-width: 560px) {
+    .logo__text small { display: none; }
+    .nav { gap: 12px; }
+    .nav a { font-size: 0.875rem; }
+    .nav .nav__cta { padding: 9px 12px; }
+  }
+
+
+  .site-footer { background: var(--navy); color: rgb(255 255 255 / 0.75); padding: 48px 0 28px; }
+  .site-footer__in { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 32px; }
+  .site-footer__brand { margin: 0 0 8px; color: #fff; font: 700 1.5rem/1 var(--font-display); letter-spacing: 0.1em; }
+  .site-footer__brand span { color: var(--sky); font: 500 0.75rem var(--font-mono); letter-spacing: 0.14em; text-transform: uppercase; margin-left: 6px; }
+  .site-footer__small { margin: 0; font-size: 0.875rem; }
+  .site-footer__links { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(2, auto); gap: 8px 32px; }
+  .site-footer__links a { color: #fff; text-decoration: none; font-size: 0.9375rem; }
+  .site-footer__links a:hover { color: var(--sky); }
+  .site-footer__fine { margin-top: 36px; padding-top: 20px; border-top: 1px solid rgb(255 255 255 / 0.12); font-size: 0.8125rem; color: rgb(255 255 255 / 0.55); }
+</style>
+
+<script>
+const toggle=document.querySelector<HTMLButtonElement>('.menu-toggle');
+const menu=document.getElementById('main-nav');
+function close(){toggle?.setAttribute('aria-expanded','false');menu?.classList.remove('is-open');}
+toggle?.addEventListener('click',()=>{const open=toggle.getAttribute('aria-expanded')!=='true';toggle.setAttribute('aria-expanded',String(open));menu?.classList.toggle('is-open',open);});
+menu?.querySelectorAll('a').forEach(a=>a.addEventListener('click',close));
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&toggle?.getAttribute('aria-expanded')==='true'){close();toggle.focus();}});
+</script>
+<style is:global>
+.site-header{background:#fff;border-bottom:1px solid var(--line);}
+.site-header__in{min-height:88px;}
+.logo img,.footer-logo{width:160px;height:auto;}
+.footer-logo{margin-bottom:22px;}
+.footer-email{color:#fff;text-decoration:none;}
+.nav a{color:var(--ink);font-size:.875rem;}
+.nav a:hover,.nav a[aria-current="page"]{color:var(--blue);}
+.nav .nav__cta{background:var(--blue);color:#fff;padding:15px 22px;}
+.menu-toggle{display:none;}
+@media(max-width:760px){
+.site-header__in{min-height:76px;flex-wrap:wrap;gap:0;}
+.logo img{width:132px;}
+.menu-toggle{display:flex;gap:10px;align-items:center;background:#fff;border:1px solid var(--line);border-radius:6px;padding:10px 12px;font:600 .8rem var(--font-body);color:var(--ink);}
+#main-nav{display:none;flex-basis:100%;padding:10px 0 20px;}
+#main-nav.is-open{display:block;}
+.nav{align-items:stretch;flex-direction:column;gap:0;}
+.nav a{display:block;padding:14px 10px;}
+.nav .nav__cta{margin-top:8px;text-align:center;}
+}
+</style>
