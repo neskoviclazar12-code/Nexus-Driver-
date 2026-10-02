@@ -10,7 +10,7 @@ interface Props {
 }
 const { title, description, schema, noindex = false } = Astro.props;
 const canonical = new URL(Astro.url.pathname, SITE.url).toString();
-const ogImage = new URL("/og/nexus-og.jpg", SITE.url).toString();
+const ogImage = new URL("/og/nexus-og-logo.jpg", SITE.url).toString();
 const path = Astro.url.pathname;
 const orgSchema = {
   "@context": "https://schema.org",
@@ -19,7 +19,7 @@ const orgSchema = {
   legalName: SITE.legalName,
   url: SITE.url,
   logo: `${SITE.url}/icon-512.png`,
-  image: `${SITE.url}/og/nexus-og.jpg`,
+  image: `${SITE.url}/og/nexus-og-logo.jpg`,
   email: SITE.email,
   telephone: SITE.phoneE164,
   contactPoint: [{ "@type": "ContactPoint", contactType: "customer service", email: SITE.email, telephone: SITE.phoneE164, areaServed: "US", availableLanguage: ["English"] }],
