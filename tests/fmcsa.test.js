@@ -6,7 +6,11 @@ const get=q=>fmcsa.fetch(new Request('https://nexusdrivers.com/api/fmcsa?q='+enc
 test('fmcsa lookup: no key, DOT, MC, name, upstream failure',async()=>{
  const original=globalThis.fetch;const old=process.env.FMCSA_WEBKEY;const urls=[];
  try{
-  delete process.env.FMCSA_WEBKEY;let r=await get('1234567');assert.equal(r.status,503);assert.equal((await r.json()).fallback,true);
+  delete process.env.FMCSA_WEBKEY;
+  globalThis.fetch=async(url)=>{urls.push(String(url));return Response.json([{dot_number:'1234567',legal_name:'CENSUS FLEET',phy_state:'IL',power_units:'14',status_code:'A'}]);};
+  let r=await get('1234567');let c=await r.json();assert.equal(r.status,200);assert.equal(c.results[0].legalName,'CENSUS FLEET');assert.equal(c.results[0].powerUnits,14);assert.ok(urls.at(-1).includes('data.transportation.gov')&&urls.at(-1).includes('dot_number=1234567'));
+  await get('acme trucking');assert.ok(urls.at(-1).includes('%24q=acme+trucking'));
+  c=await (await get('MC 123456')).json();assert.equal(c.results.length,0);assert.match(c.note,/MC search/);
   process.env.FMCSA_WEBKEY='test-key';
   assert.equal((await get('a')).status,400);
   globalThis.fetch=async(url)=>{urls.push(String(url));

@@ -23,7 +23,7 @@ All driver applications and carrier inquiries go to **info@nexusdrivers.com**. A
 3. Create a sending API key in Resend. Add `RESEND_API_KEY` as a server-side secret in the Vercel project environment settings. Do not put it in source files, browser code or a PUBLIC_ variable.
 4. Set `RESEND_FROM_EMAIL` to `Nexus Driver Solutions <info@nexusdrivers.com>` (the default), after domain verification.
 5. Redeploy and send a controlled test from each form. Check both the admin inbox and the visitor inbox, including spam, plus the Resend delivery logs. These end-to-end checks have NOT been run in this package.
-6. For the FMCSA company search on `/carriers/book-a-call/`, register for a free WebKey at https://mobile.fmcsa.dot.gov/QCDevsite/ and add it as `FMCSA_WEBKEY` (server-side) in Vercel. Without it the page still works: carriers enter their DOT number manually and get a link to FMCSA SAFER.
+6. FMCSA company search on `/carriers/book-a-call/` works without any key: it searches FMCSA's public Company Census data (data.transportation.gov) by USDOT number or company name, even on static hosting or `npm run dev`. Optional: add a free QCMobile WebKey as `FMCSA_WEBKEY` in Vercel to also search by MC number.
 
 The UI shows success only after the email provider accepts both emails. Acceptance is not a guarantee of inbox delivery; bounces and delivery failures must be checked in the provider dashboard. Missing credentials or provider failures display an error and preserve the completed form. The form does not fall back to opening the visitor's email app.
 

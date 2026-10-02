@@ -14,7 +14,7 @@ const zones = ["Central", "Eastern", "Mountain", "Pacific"];
 const TOTAL = 9;
 ---
 <Base
-  title="Book a 15-Minute Call | Driver Recruiting for Carriers | Nexus"
+  title="Book a 15-Minute Call | Driver Recruiting for Carriers | Nexus Driver Solutions"
   description="Find your company on FMCSA, tell us about your fleet and the drivers you need, and pick a time for a 15-minute call with Nexus Driver Solutions."
 >
   <section class="book-band">
@@ -228,12 +228,12 @@ const TOTAL = 9;
       const t = document.createElement("strong"); t.textContent = r.legalName + (r.dbaName ? ` (${r.dbaName})` : "");
       const m = document.createElement("small");
       const loc = [r.city, r.state].filter(Boolean).join(", ");
-      m.textContent = [`USDOT ${r.dotNumber}`, loc, r.powerUnits != null ? `${r.powerUnits} power units` : "", r.allowedToOperate ? "Authorized" : "Not authorized"].filter(Boolean).join(" · ");
+      m.textContent = [`USDOT ${r.dotNumber}`, loc, r.powerUnits != null ? `${r.powerUnits} power units` : "", r.allowedToOperate ? "Active" : "Not active"].filter(Boolean).join(" · ");
       box.append(t, m); label.append(input, box); results.append(label);
       input.addEventListener("change", () => {
         manual.hidden = true;
         setCompany({ company: r.legalName, dot_number: r.dotNumber, mc_number: "", fmcsa_location: loc,
-          fmcsa_power_units: r.powerUnits != null ? String(r.powerUnits) : "", fmcsa_status: r.allowedToOperate ? "Authorized" : "Not authorized" });
+          fmcsa_power_units: r.powerUnits != null ? String(r.powerUnits) : "", fmcsa_status: r.allowedToOperate ? "Active" : "Not active" });
         const b = bucket(r.powerUnits);
         const tile = b && form.querySelector(`input[name="fleet_size"][value="${b}"]`);
         if (tile) { tile.checked = true; document.getElementById("fleet-hint").textContent = `FMCSA lists ${r.powerUnits} power units. Change it if that's out of date.`; }
@@ -241,21 +241,40 @@ const TOTAL = 9;
     });
   }
 
+  // Direct lookup in FMCSA's public Company Census data (no key, works on any host).
+  async function censusSearch(term) {
+    const p = new URLSearchParams({ $limit: "10", $select: "dot_number,legal_name,dba_name,phy_city,phy_state,power_units,total_drivers,status_code" });
+    if (/^\d{1,8}$/.test(term)) p.set("dot_number", term); else { p.set("$q", term); p.set("$where", "status_code='A'"); }
+    const res = await fetch(`https://data.transportation.gov/resource/az4n-8mr2.json?${p}`, { signal: AbortSignal.timeout(12000) });
+    if (!res.ok) throw new Error("census");
+    const rows = await res.json();
+    return rows.map((r) => ({ legalName: r.legal_name || "", dbaName: r.dba_name || "", dotNumber: String(r.dot_number || ""),
+      city: r.phy_city || "", state: r.phy_state || "", powerUnits: r.power_units ? Number(r.power_units) : null, allowedToOperate: r.status_code === "A" }))
+      .filter((r) => r.dotNumber);
+  }
+
   async function search() {
     const term = q.value.trim();
     if (term.length < 2) { msg.textContent = "Type at least 2 characters."; return; }
     msg.textContent = "Searching FMCSA…"; results.innerHTML = "";
+    let list = null, note = "";
     try {
       const res = await fetch(`/api/fmcsa?q=${encodeURIComponent(term)}`, { signal: AbortSignal.timeout(12000) });
-      const data = await res.json().catch(() => ({}));
-      if (!res.ok) throw Object.assign(new Error(data.error || "Search failed."), { fallback: true });
-      if (!data.results?.length) { msg.textContent = "No match. Try your USDOT number, or enter it manually below."; manual.hidden = false; return; }
-      msg.textContent = `${data.results.length} match${data.results.length > 1 ? "es" : ""}. Pick your company.`;
-      render(data.results);
-    } catch (e) {
-      msg.textContent = "FMCSA search isn't available right now. Enter your DOT number manually, or look it up on SAFER.";
-      manual.hidden = false;
+      const data = await res.json();
+      if (res.ok && Array.isArray(data.results)) { list = data.results; note = data.note || ""; }
+    } catch (e) { /* API not available on this host: fall back below */ }
+    if (list === null) {
+      const mcOnly = /^(mc|mx|ff)[\s#-]*\d+$/i.test(term);
+      if (mcOnly) { list = []; note = "MC search isn't available here. Search by USDOT number or company name."; }
+      else { try { list = await censusSearch(term); } catch (e) { list = null; } }
     }
+    if (list === null) {
+      msg.textContent = "FMCSA search isn't available right now. Enter your DOT number manually, or look it up on SAFER.";
+      manual.hidden = false; return;
+    }
+    if (!list.length) { msg.textContent = note || "No match. Try your USDOT number, or enter it manually below."; manual.hidden = false; return; }
+    msg.textContent = `${list.length} match${list.length > 1 ? "es" : ""}. Pick your company.`;
+    render(list);
   }
   document.getElementById("fm-go").addEventListener("click", search);
   q.addEventListener("keydown", (e) => { if (e.key === "Enter") { e.preventDefault(); search(); } });
