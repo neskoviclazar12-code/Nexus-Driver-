@@ -34,7 +34,7 @@ const aboutPage = { "@context": "https://schema.org", "@type": "AboutPage", name
       </ul>
 
       <h2>Contact</h2>
-      <p>{SITE.legalName}<br />{SITE.address.street}, {SITE.address.city}, {SITE.address.region} {SITE.address.zip}<br /><a href={`mailto:${SITE.email}`}>{SITE.email}</a></p>
+      <p>{SITE.legalName}<br />{SITE.address.street}, {SITE.address.city}, {SITE.address.region} {SITE.address.zip}<br /><a href={`mailto:${SITE.email}`}>{SITE.email}</a> · <a href={SITE.phoneHref}>{SITE.phone}</a></p>
       <p class="ctas"><a class="btn btn--blue" href={SITE.hireUrl}>Hire Drivers</a> <a class="btn btn--line" href="/apply/">Apply as a driver</a></p>
     </div>
   </section>

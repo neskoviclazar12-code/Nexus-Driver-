@@ -1,6 +1,9 @@
 export const SITE = {
   name: "Nexus Driver Solutions",
   email: "info@nexusdrivers.com",
+  phone: "(307) 317-2875",
+  phoneHref: "tel:+13073172875",
+  phoneE164: "+1-307-317-2875",
   legalName: "Nexus Driver Solutions LLC",
   url: "https://www.nexusdrivers.com",
   instagram: "https://www.instagram.com/_nexusds/",

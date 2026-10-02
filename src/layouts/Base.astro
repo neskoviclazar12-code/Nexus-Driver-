@@ -21,7 +21,8 @@ const orgSchema = {
   logo: `${SITE.url}/icon-512.png`,
   image: `${SITE.url}/og/nexus-og.jpg`,
   email: SITE.email,
-  contactPoint: [{ "@type": "ContactPoint", contactType: "customer service", email: SITE.email, areaServed: "US", availableLanguage: ["English"] }],
+  telephone: SITE.phoneE164,
+  contactPoint: [{ "@type": "ContactPoint", contactType: "customer service", email: SITE.email, telephone: SITE.phoneE164, areaServed: "US", availableLanguage: ["English"] }],
   sameAs: [SITE.instagram, SITE.facebook].filter(Boolean),
   address: {
     "@type": "PostalAddress",
@@ -92,8 +93,12 @@ const nav = [
       <div class="wrap site-footer__in">
         <div>
           <img class="footer-logo" src="/brand/nexus-wordmark-light.png" alt="Nexus Driver Solutions" width="160" height="34" loading="lazy" />
-          <p><a class="footer-email" href={`mailto:${SITE.email}`}>{SITE.email}</a></p>
-          <p class="site-footer__small">CDL-A driver recruiting for drivers and carriers.<br />{SITE.legalName} · {SITE.address.street}, {SITE.address.city}, {SITE.address.region} {SITE.address.zip}</p>
+          <p class="site-footer__small">CDL-A driver recruiting for drivers and carriers.</p>
+          <ul class="fcontact">
+            <li><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg><a href={`mailto:${SITE.email}`}>{SITE.email}</a></li>
+            <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></svg><a href={SITE.phoneHref}>{SITE.phone}</a></li>
+            <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg><span>{SITE.address.street}<br />{SITE.address.city}, {SITE.address.region} {SITE.address.zip}</span></li>
+          </ul>
         </div>
         <ul class="site-footer__links">
           <li><a href="/cdl-jobs/">CDL-A jobs</a></li>
@@ -162,7 +167,10 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&toggle?.getAttribut
 .site-header__in{min-height:88px;}
 .logo img,.footer-logo{width:160px;height:auto;}
 .footer-logo{margin-bottom:22px;}
-.footer-email{color:#fff;text-decoration:none;}
+.fcontact{list-style:none;margin:18px 0 0;padding:0;display:grid;gap:10px;font-size:.9375rem;}
+.fcontact li{display:grid;grid-template-columns:18px 1fr;gap:12px;align-items:start;}
+.fcontact svg{width:18px;height:18px;margin-top:3px;fill:none;stroke:#fff;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;opacity:.85}
+.fcontact a{color:#fff;text-decoration:none;}.fcontact a:hover{color:var(--sky);}
 .nav a{color:var(--ink);font-size:.875rem;}
 .nav a:hover,.nav a[aria-current="page"]{color:var(--blue);}
 .nav .nav__cta{background:var(--blue);color:#fff;padding:15px 22px;}

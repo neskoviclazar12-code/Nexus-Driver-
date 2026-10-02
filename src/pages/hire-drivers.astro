@@ -1,6 +1,7 @@
 ---
 import Base from "../layouts/Base.astro";
 import { SITE } from "../config";
+import Consent from "../components/Consent.astro";
 
 const fleet = ["1–5 trucks", "6–10 trucks", "11–19 trucks", "20–50 trucks", "51–100 trucks", "101–200 trucks", "200+ trucks"];
 const cpm = ["Under 70¢", "70¢", "72–75¢", "80¢", "85¢", "90¢+"];
@@ -154,6 +155,7 @@ const TOTAL = 9;
           </div>
           <div class="field"><label for="c-email">Email</label><input id="c-email" name="email" type="email" autocomplete="email" /></div>
           <div class="field"><label for="c-notes">Anything we should know? (optional)</label><textarea id="c-notes" name="notes" placeholder="Lanes, minimum experience, home time…"></textarea></div>
+          <Consent audience="carrier" />
           <div class="hp" aria-hidden="true"><label>Company website<input name="company_website" tabindex="-1" autocomplete="off" /></label></div>
         </fieldset>
 
@@ -368,6 +370,8 @@ const TOTAL = 9;
       phone: field("c-phone"),
       email: field("c-email"),
       notes: field("c-notes"),
+      call_consent: form.querySelector('input[name="call_consent"]').checked ? "yes" : "no",
+      sms_consent: form.querySelector('input[name="sms_consent"]').checked ? "yes" : "no",
     };
 
     next.disabled = true; const label = next.textContent; next.textContent = "Sending…";

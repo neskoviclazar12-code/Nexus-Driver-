@@ -13,7 +13,7 @@ import { SITE } from "../config";
    const data=Object.fromEntries(new FormData(form).entries());
    if(data.company_website)return;
    data.form=form.dataset.nexusForm;data.submission_id=submissionId;
-   if(data.form==='driver_application')data.sms_consent=data.sms_consent||'no';
+   if(form.querySelector('input[name="sms_consent"]')){data.sms_consent=data.sms_consent||'no';data.call_consent=data.call_consent||'no';}
    button.disabled=true;const label=button.textContent;button.textContent='Sending…';
    try{
     const res=await fetch(endpoint,{method:'POST',headers:{'Content-Type':'application/json',Accept:'application/json'},body:JSON.stringify(data),signal:AbortSignal.timeout(20000)});

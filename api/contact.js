@@ -2,10 +2,10 @@ import { createHash } from 'node:crypto';
 const INBOX = 'info@nexusdrivers.com';
 const EMAIL = /^[^\s<>@]+@[^\s<>@]+\.[^\s<>@]+$/;
 const FIELDS = {
-  driver_application: ['first_name','last_name','email','phone','state','zip','experience','position','job','trailer','sms_consent'],
+  driver_application: ['first_name','last_name','email','phone','state','zip','experience','position','job','trailer','call_consent','sms_consent'],
   carrier_inquiry: ['company','contact_name','mc_number','dot_number','email','phone','drivers_needed','trailer','positions','notes'],
-  general_message: ['name','email','phone','role','message'],
-  call_request: ['company','dot_number','mc_number','fmcsa_location','fmcsa_power_units','fmcsa_status','fleet_size','pay_type','cpm_rate','gross_rate','trailers','escrow','truck_year','positions','drivers_needed','call_date','call_time','timezone','contact_name','phone','email','notes'],
+  general_message: ['name','email','phone','role','message','call_consent','sms_consent'],
+  call_request: ['company','dot_number','mc_number','fmcsa_location','fmcsa_power_units','fmcsa_status','fleet_size','pay_type','cpm_rate','gross_rate','trailers','escrow','truck_year','positions','drivers_needed','call_date','call_time','timezone','contact_name','phone','email','notes','call_consent','sms_consent'],
 };
 const REQUIRED = {
   driver_application: ['first_name','last_name','email','phone','state','zip','experience','position'],
@@ -35,7 +35,7 @@ export default {
   }
   if(REQUIRED[d.form].some(k=>!values[k]) || !EMAIL.test(values.email) || /[\r\n]/.test(values.email) || (d.form!=='general_message'||values.phone) && (values.phone.replace(/\D/g,'').length<10 || values.phone.replace(/\D/g,'').length>15)) return json(400,{error:'Please enter valid contact details and complete all required fields.'});
   if(d.form==='driver_application' && (!/^\d{5}$/.test(values.zip)||!/^\w{2}$/.test(values.state)))return json(400,{error:'Please check your state and ZIP code.'});
-  if(d.form==='driver_application')values.sms_consent=values.sms_consent==='yes'?'yes':'no';
+  for(const k of ['call_consent','sms_consent'])if(k in values)values[k]=values[k]==='yes'?'yes':'no';
   const key=process.env.RESEND_API_KEY;
   const from=process.env.RESEND_FROM_EMAIL || 'Nexus Driver Solutions <info@nexusdrivers.com>';
   if(!key)return json(503,{error:'Online submissions are temporarily unavailable. Please email info@nexusdrivers.com.'});

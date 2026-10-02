@@ -1,6 +1,7 @@
 ---
 import Base from "../layouts/Base.astro";
 import FormScript from "../components/FormScript.astro";
+import Consent from "../components/Consent.astro";
 import { activeJobs } from "../data/jobs";
 
 const list = activeJobs();
@@ -34,7 +35,7 @@ const states = ["AL","AR","AZ","CA","CO","CT","DC","DE","FL","GA","IA","ID","IL"
           <div class="field"><label for="last_name">Last name</label><input id="last_name" name="last_name" autocomplete="family-name" required /></div>
         </div>
         <div class="form__row">
-          <div class="field"><label for="phone">Mobile phone</label><input id="phone" name="phone" type="tel" autocomplete="tel" inputmode="tel" pattern="[0-9()+\-\s.]{10,}" required /></div>
+          <div class="field"><label for="phone">Mobile phone</label><input id="phone" name="phone" type="tel" autocomplete="tel" inputmode="tel" required /></div>
           <div class="field"><label for="email">Email</label><input id="email" name="email" type="email" autocomplete="email" required /></div>
         </div>
         <div class="form__row">
@@ -84,10 +85,7 @@ const states = ["AL","AR","AZ","CA","CO","CT","DC","DE","FL","GA","IA","ID","IL"
 
         <div class="hp" aria-hidden="true"><label>Company website<input name="company_website" tabindex="-1" autocomplete="off" /></label></div>
 
-        <label class="check">
-          <input type="checkbox" name="sms_consent" value="yes" />
-          <span>Optional: I agree that Nexus Driver Solutions may call and text me at the number above about driving jobs, including with automated technology. Consent is not a condition of any job. Message and data rates may apply; reply STOP to opt out. See our <a href="/sms-terms/">SMS Terms</a> and <a href="/privacy-policy/">Privacy Policy</a>.</span>
-        </label>
+        <Consent audience="driver" />
 
         <button class="btn btn--dark" type="submit">Send my application</button>
         <p class="form-status" role="status" tabindex="-1" hidden></p>

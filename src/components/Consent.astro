@@ -1,0 +1,28 @@
+---
+// Two separate, optional consents (calls/emails and SMS). SMS consent must never be required (A2P 10DLC / TCPA).
+import { SITE } from "../config";
+interface Props { audience?: "driver" | "carrier" | "general" }
+const { audience = "driver" } = Astro.props;
+const topic = audience === "driver" ? "job opportunities and employment-related communication" : audience === "carrier" ? "driver recruiting services and my request" : "my message and related Nexus services";
+const smsTopic = audience === "driver" ? "job opportunities and application updates" : audience === "carrier" ? "driver recruiting services and scheduling" : "my message and related updates";
+---
+<div class="consents">
+  <label class="consent">
+    <input type="checkbox" name="call_consent" value="yes" />
+    <span><strong>Consent for calls/emails:</strong> I agree to receive calls and emails from {SITE.name} at the phone number and email address provided above regarding {topic}.</span>
+  </label>
+  <label class="consent">
+    <input type="checkbox" name="sms_consent" value="yes" />
+    <span><strong>SMS consent:</strong> I agree to receive recurring automated text messages from {SITE.name} at the phone number provided regarding {smsTopic}. Message frequency varies. Message and data rates may apply. Reply STOP to opt out or HELP for assistance. View our <a href="/sms-terms/">SMS Terms</a> and <a href="/privacy-policy/">Privacy Policy</a>.</span>
+  </label>
+  <p class="consent__note">Consent is not a condition of {audience === "driver" ? "applying or of employment" : "purchase"}.</p>
+</div>
+<style is:global>
+  .consents { display: grid; gap: 12px; }
+  .consent { display: grid; grid-template-columns: 22px 1fr; gap: 12px; align-items: start; padding: 16px 18px; background: var(--paper-2); border: 1px solid var(--line); border-radius: 10px; font-size: 0.875rem; line-height: 1.55; color: var(--ink-2); cursor: pointer; }
+  .consent strong { display: block; color: var(--ink); margin-bottom: 2px; }
+  .consent input { width: 18px; height: 18px; margin-top: 2px; accent-color: var(--royal); }
+  .consent:has(input:checked) { border-color: var(--royal); background: #eef3ff; }
+  .consent a { color: var(--blue); }
+  .consent__note { margin: 2px 0 0; font-size: 0.8125rem; color: var(--ink-3); }
+</style>

@@ -1,13 +1,14 @@
 ---
 import Base from "../layouts/Base.astro";
 import FormScript from "../components/FormScript.astro";
+import Consent from "../components/Consent.astro";
 import { SITE } from "../config";
 const crumbs = { "@context": "https://schema.org", "@type": "BreadcrumbList", itemListElement: [
   { "@type": "ListItem", position: 1, name: "Home", item: SITE.url + "/" },
   { "@type": "ListItem", position: 2, name: "Contact", item: SITE.url + "/contact/" } ] };
 const contactPage = { "@context": "https://schema.org", "@type": "ContactPage", name: "Contact Nexus Driver Solutions", url: SITE.url + "/contact/" };
 ---
-<Base title="Contact Nexus Driver Solutions | CDL Driver Recruiting" description="Contact Nexus Driver Solutions. Carriers can start hiring CDL-A drivers, drivers can apply for CDL-A jobs, or send us a message at info@nexusdrivers.com." schema={[contactPage, crumbs]}>
+<Base title="Contact Nexus Driver Solutions | CDL Driver Recruiting" description="Contact Nexus Driver Solutions. Carriers can start hiring CDL-A drivers, drivers can apply for CDL-A jobs, or call (307) 317-2875 or email info@nexusdrivers.com." schema={[contactPage, crumbs]}>
   <section class="band">
     <div class="wrap">
       <p class="mono-label">Contact</p>
@@ -26,6 +27,7 @@ const contactPage = { "@context": "https://schema.org", "@type": "ContactPage", 
           <strong>{SITE.legalName}</strong>
           <span>{SITE.address.street}<br />{SITE.address.city}, {SITE.address.region} {SITE.address.zip}</span>
           <a href={`mailto:${SITE.email}`}>{SITE.email}</a>
+          <a href={SITE.phoneHref}>{SITE.phone}</a>
           <a href={SITE.instagram} target="_blank" rel="noopener">Instagram @_nexusds</a>
         </div>
       </div>
@@ -44,6 +46,7 @@ const contactPage = { "@context": "https://schema.org", "@type": "ContactPage", 
           </div>
         </div>
         <div class="field"><label for="g-msg">Message</label><textarea id="g-msg" name="message" required></textarea></div>
+        <Consent audience="general" />
         <div class="hp" aria-hidden="true"><label>Company website<input name="company_website" tabindex="-1" autocomplete="off" /></label></div>
         <button class="btn btn--dark" type="submit">Send message</button>
         <p class="form-status" role="status" tabindex="-1" hidden></p>
